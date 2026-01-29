@@ -20,19 +20,22 @@ This project is deployed as a **GitHub Pages** static site with **Firebase Fires
 - Custom color scheme matching event branding
 
 ### Admin Interface
+- **Secure login system** with password protection
 - Add/remove clubs/teams
 - Rename clubs inline
-- Award points (+1 or +3)
+- Award points (+1 or +3) with **click prevention**
 - Secure delete confirmation
 - **Real-time sync** across multiple users and devices
 - **Multi-admin support** - Multiple users can manage simultaneously
+- **Logout functionality** for security
 
 ### Technical Features
 - **Firebase Firestore backend** for real-time cloud synchronization
 - **Multi-device support** - Phones, tablets, desktops sync instantly
 - **Offline persistence** - Works offline, syncs when back online
-- **No authentication required** - Public access for simplicity
-- **Fallback to localStorage** if Firebase unavailable
+- **Authentication system** - Simple password-based login (password: hbs2026)
+- **Click prevention** - Prevents double-clicks on point buttons
+- **No localStorage fallback** - Firebase-only implementation
 - Smooth CSS animations and transitions
 - Mobile-responsive design
 - **Modular file structure** - Separated HTML, CSS, and JS
@@ -60,14 +63,16 @@ The application uses a custom color scheme inspired by the event branding:
 
 ### For Administrators
 1. Click the **ADMIN** tab to access management features
-2. Add new clubs using the input field
-3. Award points using the +1/+3 buttons
-4. Rename clubs by clicking the edit icon (✎)
-5. Delete clubs with double-confirmation for safety
-6. **Multi-user collaboration** - Multiple admins can work simultaneously
+2. **Login required** - Enter password: `hbs2026`
+3. Add new clubs using the input field
+4. Award points using the +1/+3 buttons (click prevention enabled)
+5. Rename clubs by clicking the edit icon (✎)
+6. Delete clubs with double-confirmation for safety
+7. **Multi-user collaboration** - Multiple admins can work simultaneously
+8. Click **LOGOUT** when finished (appears when logged in)
 
 ### For Viewers
-1. The **LIVE** tab shows the current rankings
+1. The **LIVE** tab shows the current rankings (no login required)
 2. Rankings update automatically in real-time
 3. Top 3 positions are highlighted with gold styling
 4. Point changes trigger smooth animations
@@ -105,8 +110,10 @@ hbs2026/
 - **Real-time synchronization**: Instant updates across all connected users
 - **Offline persistence**: Works offline, syncs automatically when back online
 - **Cross-device sync**: Phones, tablets, desktops all synchronized
-- **Fallback support**: LocalStorage backup if Firebase unavailable
-- **No authentication required**: Public read/write access for simplicity
+- **Authentication required**: Password-based login for admin functions
+- **Admin protection**: All write operations require login
+- **Public read access**: Anyone can view rankings without login
+- **No localStorage fallback**: Firebase-only implementation
 
 ## 🔥 Firebase Setup
 
@@ -131,6 +138,9 @@ The repository is configured for GitHub Pages deployment:
 - Firebase free tier includes 1GB storage and 50k document reads/day
 - Data persists in the cloud - no data loss on browser clear
 - Works across multiple devices simultaneously
-- Fallback to localStorage if Firebase is unavailable
-- For production use, consider implementing authentication
+- **Login required** for admin functions (password: hbs2026)
+- **Click prevention** prevents accidental double-clicks on point buttons
+- **No localStorage fallback** - Firebase-only implementation for reliability
 - Security rules allow public access for simplicity
+- Admin functions are protected by client-side authentication
+- For production use, consider implementing server-side authentication
