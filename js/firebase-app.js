@@ -21,7 +21,7 @@ const firebaseConfig = {
  */
 let clubs = [];
 let deleteConfirmId = null;
-const itemHeight = 64;
+const itemHeight = 72;
 let unsubscribeClubs = null;
 let db = null;
 let auth = null; // Firebase Auth
@@ -410,6 +410,17 @@ function switchTab(tab) {
     document.getElementById('btn-dashboard').className = !isAdmin ? 
         "px-5 py-2 rounded-lg text-sm font-bold bg-[#e4c342] text-[#3f755f]" : 
         "px-5 py-2 rounded-lg text-sm font-bold text-white/50";
+    
+    // Hide/show countdown and footer in admin view
+    const countdownSection = document.querySelector('.countdown-section');
+    const footer = document.querySelector('footer');
+    
+    if (countdownSection) {
+        countdownSection.style.display = isAdmin ? 'none' : 'block';
+    }
+    if (footer) {
+        footer.style.display = isAdmin ? 'none' : 'block';
+    }
     
     // Show admin tab if logged in
     if (isAdmin && isLoggedIn) {
