@@ -64,17 +64,17 @@ body {
     font-family: 'Plus Jakarta Sans', sans-serif;
     display: flex;
     justify-content: center;
-    gap: 2rem;
+    gap: 1.5rem;
     flex-wrap: wrap;
 }
 
 .countdown-item {
     text-align: center;
-    min-width: 60px;
+    min-width: 50px;
 }
 
 .countdown-number {
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 800;
     color: var(--gold);
     line-height: 1;
@@ -82,18 +82,18 @@ body {
 }
 
 .countdown-label {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     opacity: 0.9;
-    margin-top: 0.5rem;
+    margin-top: 0.25rem;
 }
 
 .footer-info {
     text-align: center;
-    padding: 1rem 0;
+    padding: 0.5rem 0;
     border-top: 1px solid rgba(255,255,255,0.1);
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     opacity: 0.8;
 }
 

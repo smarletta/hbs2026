@@ -120,12 +120,11 @@ function updateCountdown() {
     }
     
     const updatedDiff = saturday - now;
-    const days = Math.floor(updatedDiff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((updatedDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const totalHours = Math.floor(updatedDiff / (1000 * 60 * 60));
+    const hours = totalHours % 24;
     const minutes = Math.floor((updatedDiff % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((updatedDiff % (1000 * 60)) / 1000);
     
-    document.getElementById('countdown-days').textContent = String(days).padStart(2, '0');
     document.getElementById('countdown-hours').textContent = String(hours).padStart(2, '0');
     document.getElementById('countdown-minutes').textContent = String(minutes).padStart(2, '0');
     document.getElementById('countdown-seconds').textContent = String(seconds).padStart(2, '0');
