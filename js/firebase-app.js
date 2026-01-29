@@ -16,6 +16,7 @@ let unsubscribeClubs = null;
 let db = null;
 let isLoggedIn = false;
 let processingClicks = new Set(); // Track which buttons are being processed
+let showAllInDashboard = false; // Toggle for dashboard view
 
 // Initialize Firebase when DOM is ready
 function initializeFirebase() {
@@ -220,6 +221,21 @@ function switchTab(tab) {
         document.getElementById('dashboard-tab').classList.add('hidden');
     }
     
+    // Show/hide dashboard controls based on login status
+    const dashboardControls = document.getElementById('dashboard-controls');
+    if (!isAdmin && isLoggedIn) {
+        dashboardControls.classList.remove('hidden');
+    } else {
+        dashboardControls.classList.add('hidden');
+    }
+    
+    render();
+}
+
+function toggleDashboardView() {
+    showAllInDashboard = !showAllInDashboard;
+    const toggleBtn = document.getElementById('btn-toggle-view');
+    toggleBtn.textContent = showAllInDashboard ? 'TOP 10 ANZEIGEN' : 'ALLE ANZEIGEN';
     render();
 }
 
@@ -314,12 +330,12 @@ function render() {
         </div>
     `).join('');
 
-    // Dashboard Rendering - show only top 10 clubs
+    // Dashboard Rendering - show top 10 or all based on toggle
     const sorted = [...clubs].sort((a, b) => b.points - a.points);
-    const top10 = sorted.slice(0, 10); // Limit to top 10
-    rankingList.style.height = `${top10.length * itemHeight}px`;
+    const displayClubs = (isLoggedIn && showAllInDashboard) ? sorted : sorted.slice(0, 10);
+    rankingList.style.height = `${displayClubs.length * itemHeight}px`;
 
-    top10.forEach((c, index) => {
+    displayClubs.forEach((c, index) => {
         let el = rankingList.querySelector(`[data-id="${c.id}"]`);
         const isNew = !el;
         if (isNew) {
@@ -341,9 +357,9 @@ function render() {
         `;
     });
 
-    // Remove elements that are no longer in top 10
+    // Remove elements that are no longer in display
     Array.from(rankingList.children).forEach(child => {
-        if (!top10.find(c => c.id === child.dataset.id)) child.remove();
+        if (!displayClubs.find(c => c.id === child.dataset.id)) child.remove();
     });
 }
 
