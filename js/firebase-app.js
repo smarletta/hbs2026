@@ -640,7 +640,7 @@ function updateCountdown() {
 // Register service worker for PWA (independent of DOM ready)
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/hbs2026/sw.js')
+        navigator.serviceWorker.register('/sw.js')
             .then((registration) => {
                 console.log('Service Worker registered successfully:', registration.scope);
             })
