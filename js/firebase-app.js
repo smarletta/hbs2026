@@ -11,7 +11,7 @@ const firebaseConfig = {
 // Global variables
 let clubs = [];
 let deleteConfirmId = null;
-const itemHeight = 90;
+const itemHeight = 64; // Reduced from 90 to fit condensed cards
 let unsubscribeClubs = null;
 let db = null;
 let isLoggedIn = false;
