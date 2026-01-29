@@ -42,20 +42,70 @@ function initializeFirebase() {
     }
 }
 
-// Login system with Firebase Authentication
+// Modal functions
+function showLoginModal() {
+    const modal = document.getElementById('loginModal');
+    const modalContent = document.getElementById('loginModalContent');
+    
+    modal.classList.remove('hidden');
+    setTimeout(() => {
+        modalContent.classList.remove('scale-95', 'opacity-0');
+        modalContent.classList.add('scale-100', 'opacity-100');
+    }, 10);
+    
+    // Focus email input
+    setTimeout(() => {
+        document.getElementById('loginEmail').focus();
+    }, 300);
+    
+    // Clear previous errors
+    document.getElementById('loginError').classList.add('hidden');
+    document.getElementById('loginForm').reset();
+}
+
+function closeLoginModal() {
+    const modal = document.getElementById('loginModal');
+    const modalContent = document.getElementById('loginModalContent');
+    
+    modalContent.classList.remove('scale-100', 'opacity-100');
+    modalContent.classList.add('scale-95', 'opacity-0');
+    
+    setTimeout(() => {
+        modal.classList.add('hidden');
+    }, 300);
+}
+
+function showLoginError(message) {
+    const errorDiv = document.getElementById('loginError');
+    errorDiv.textContent = message;
+    errorDiv.classList.remove('hidden');
+}
+
+function setLoginLoading(loading) {
+    const submitBtn = document.getElementById('loginSubmitBtn');
+    const btnText = document.getElementById('loginBtnText');
+    const btnLoading = document.getElementById('loginBtnLoading');
+    
+    if (loading) {
+        submitBtn.disabled = true;
+        btnText.classList.add('hidden');
+        btnLoading.classList.remove('hidden');
+    } else {
+        submitBtn.disabled = false;
+        btnText.classList.remove('hidden');
+        btnLoading.classList.add('hidden');
+    }
+}
+
+// Login system with Firebase Authentication and modern modal
 async function login() {
-    const email = prompt("Admin-Email eingeben:");
-    if (!email) return;
-    
-    const password = prompt("Admin-Passwort eingeben:");
-    if (!password) return;
-    
+    showLoginModal();
+}
+
+async function performLogin(email, password) {
     try {
-        // Show loading state
-        const adminBtn = document.getElementById('btn-admin');
-        const originalText = adminBtn.innerHTML;
-        adminBtn.innerHTML = "LADEN...";
-        adminBtn.disabled = true;
+        setLoginLoading(true);
+        showLoginError('');
         
         // Sign in with Firebase Auth
         const userCredential = await auth.signInWithEmailAndPassword(email, password);
@@ -63,13 +113,14 @@ async function login() {
         
         isLoggedIn = true;
         updateLoginUI();
+        closeLoginModal();
+        
         // Switch to admin tab after successful login
         document.getElementById('admin-tab').classList.remove('hidden');
         document.getElementById('dashboard-tab').classList.add('hidden');
         document.getElementById('btn-admin').className = "px-5 py-2 rounded-lg text-sm font-bold bg-[#e4c342] text-[#3f755f]";
         document.getElementById('btn-dashboard').className = "px-5 py-2 rounded-lg text-sm font-bold text-white/50";
         render();
-        alert("Login erfolgreich!");
         
     } catch (error) {
         console.error('Login error:', error);
@@ -81,13 +132,13 @@ async function login() {
             errorMessage = "Falsches Passwort!";
         } else if (error.code === 'auth/invalid-email') {
             errorMessage = "Ungültige Email!";
+        } else if (error.code === 'auth/too-many-requests') {
+            errorMessage = "Zu viele Versuche. Bitte später erneut versuchen.";
         }
         
-        alert(errorMessage);
+        showLoginError(errorMessage);
     } finally {
-        // Reset button state
-        adminBtn.innerHTML = originalText;
-        adminBtn.disabled = false;
+        setLoginLoading(false);
     }
 }
 
@@ -444,6 +495,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Initialize login UI
     updateLoginUI();
+    
+    // Set up login form submission
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        await performLogin(email, password);
+    });
     
     // Initialize Firebase first
     const firebaseReady = initializeFirebase();
