@@ -637,6 +637,19 @@ function updateCountdown() {
 }
 
 // ==================== INITIALIZATION ====================
+// Register service worker for PWA (independent of DOM ready)
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/hbs2026/sw.js')
+            .then((registration) => {
+                console.log('Service Worker registered successfully:', registration.scope);
+            })
+            .catch((error) => {
+                console.error('Service Worker registration failed:', error);
+            });
+    });
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('DOM loaded, starting initialization...');
     
@@ -684,19 +697,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Start countdown
     setInterval(updateCountdown, 1000);
     updateCountdown();
-
-    // Register service worker for PWA
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/hbs2026/sw.js')
-                .then((registration) => {
-                    console.log('Service Worker registered successfully:', registration.scope);
-                })
-                .catch((error) => {
-                    console.error('Service Worker registration failed:', error);
-                });
-        });
-    }
 });
 
 // Cleanup on page unload
