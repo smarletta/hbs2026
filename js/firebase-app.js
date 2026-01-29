@@ -21,7 +21,7 @@ const firebaseConfig = {
  */
 let clubs = [];
 let deleteConfirmId = null;
-const itemHeight = 84; // Reduced from 96 to create 20px gap between cards
+const itemHeight = 64;
 let unsubscribeClubs = null;
 let db = null;
 let auth = null; // Firebase Auth
@@ -36,7 +36,6 @@ let showAllInDashboard = false; // Toggle for dashboard view
  */
 let renderTimeout = null;
 let lastRenderedClubs = [];
-let clubsCache = new Map(); // Client-side cache for club data
 let isLoading = true; // Loading state for skeleton display
 
 // ==================== UTILITY FUNCTIONS ====================
@@ -442,20 +441,8 @@ async function loadClubs() {
         isLoading = true;
         debounceRender();
         
-        // Check cache first
-        if (clubsCache.size > 0) {
-            clubs = Array.from(clubsCache.values());
-            isLoading = false;
-            debounceRender();
-            return;
-        }
-        
         const snapshot = await db.collection('clubs').orderBy('points', 'desc').get();
         clubs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        
-        // Populate cache
-        clubsCache.clear();
-        clubs.forEach(club => clubsCache.set(club.id, club));
         
         isLoading = false;
         debounceRender();
@@ -513,9 +500,6 @@ function setupRealtimeListener() {
             
             if (hasChanged) {
                 clubs = newClubs;
-                // Cache the data
-                clubsCache.clear();
-                clubs.forEach(club => clubsCache.set(club.id, club));
                 // Use debounced rendering for performance
                 debounceRender();
             }
