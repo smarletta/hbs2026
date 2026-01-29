@@ -45,6 +45,11 @@ function login() {
     if (password === "hbs2026") {
         isLoggedIn = true;
         updateLoginUI();
+        // Switch to admin tab after successful login
+        document.getElementById('admin-tab').classList.remove('hidden');
+        document.getElementById('dashboard-tab').classList.add('hidden');
+        document.getElementById('btn-admin').className = "px-5 py-2 rounded-lg text-sm font-bold bg-[#e4c342] text-[#3f755f]";
+        document.getElementById('btn-dashboard').className = "px-5 py-2 rounded-lg text-sm font-bold text-white/50";
         render();
         alert("Login erfolgreich!");
     } else if (password !== null) {
@@ -100,7 +105,10 @@ async function addClub() {
 }
 
 async function addPoints(id, pts) {
+    console.log('addPoints called:', { id, pts, isLoggedIn, dbAvailable: !!db });
+    
     if (!isLoggedIn) {
+        console.log('Not logged in, prompting login...');
         alert("Bitte zuerst einloggen!");
         login();
         return;
@@ -119,6 +127,7 @@ async function addPoints(id, pts) {
         return;
     }
     
+    console.log('Processing click:', clickKey);
     processingClicks.add(clickKey);
     
     try {
@@ -126,11 +135,13 @@ async function addPoints(id, pts) {
         if (club) {
             club.points += pts;
             await saveClub(club);
+            console.log('Points added successfully:', club);
         }
     } finally {
         // Remove from processing set after a short delay
         setTimeout(() => {
             processingClicks.delete(clickKey);
+            console.log('Click processing completed:', clickKey);
         }, 500);
     }
 }
@@ -202,6 +213,13 @@ function switchTab(tab) {
     document.getElementById('btn-dashboard').className = !isAdmin ? 
         "px-5 py-2 rounded-lg text-sm font-bold bg-[#e4c342] text-[#3f755f]" : 
         "px-5 py-2 rounded-lg text-sm font-bold text-white/50";
+    
+    // Show admin tab if logged in
+    if (isAdmin && isLoggedIn) {
+        document.getElementById('admin-tab').classList.remove('hidden');
+        document.getElementById('dashboard-tab').classList.add('hidden');
+    }
+    
     render();
 }
 
