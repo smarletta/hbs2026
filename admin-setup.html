@@ -4,319 +4,349 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Setup - #HBS2026</title>
-    <link rel="stylesheet" href="styles/main.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
             background: linear-gradient(135deg, #3f755f 0%, #2c5243 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 2rem;
-            position: relative;
-            overflow: hidden;
+            padding: 1rem;
+            line-height: 1.6;
         }
-        
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="%23e4c342" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-            pointer-events: none;
-        }
-        
-        .setup-container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 3rem;
-            border-radius: 2rem;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.1);
-            max-width: 500px;
+
+        .container {
             width: 100%;
-            border: 4px solid #e4c342;
-            position: relative;
+            max-width: 480px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
-        .setup-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #e4c342, #f4d342, #e4c342);
-            animation: shimmer 3s ease-in-out infinite;
-        }
-        
-        @keyframes shimmer {
-            0%, 100% { transform: translateX(-100%); }
-            50% { transform: translateX(100%); }
-        }
-        
-        .setup-title {
-            color: #3f755f;
-            font-size: 2.5rem;
-            font-weight: 800;
+
+        .header {
+            background: linear-gradient(135deg, #3f755f 0%, #2c5243 100%);
+            padding: 2rem;
             text-align: center;
-            margin-bottom: 2rem;
             position: relative;
         }
-        
-        .setup-title::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 3px;
-            background: linear-gradient(90deg, #e4c342, #f4d342);
-            border-radius: 2px;
-        }
-        
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        
-        .form-label {
-            display: block;
-            color: #2c3330;
+
+        .header h1 {
+            color: white;
+            font-size: 1.75rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
-        
-        .form-input {
-            width: 100%;
-            padding: 1rem;
-            border: 2px solid #e0e0e0;
-            border-radius: 0.75rem;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.8);
+
+        .header p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.875rem;
         }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: #3f755f;
-            box-shadow: 0 0 0 3px rgba(62, 117, 95, 0.1);
-            transform: translateY(-2px);
+
+        .lock-icon {
+            width: 48px;
+            height: 48px;
+            background: #e4c342;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 1.5rem;
         }
-        
-        .btn-setup {
-            width: 100%;
-            background: linear-gradient(135deg, #e4c342 0%, #d4c332 100%);
-            color: #3f755f;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 0.75rem;
-            font-weight: 800;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+
+        .content {
+            padding: 2rem;
         }
-        
-        .btn-setup::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-        
-        .btn-setup:hover::before {
-            left: 100%;
-        }
-        
-        .btn-setup:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(228, 195, 66, 0.3);
-        }
-        
-        .btn-setup:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .success-message {
-            background: linear-gradient(135deg, #4caf50, #45a049);
-            color: white;
-            padding: 1.5rem;
-            border-radius: 0.75rem;
-            text-align: center;
-            margin-top: 1rem;
-            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.2);
-            animation: slideIn 0.5s ease;
-        }
-        
-        .error-message {
-            background: linear-gradient(135deg, #f44336, #da190b);
-            color: white;
-            padding: 1.5rem;
-            border-radius: 0.75rem;
-            text-align: center;
-            margin-top: 1rem;
-            box-shadow: 0 10px 25px rgba(244, 67, 54, 0.2);
-            animation: shake 0.5s ease;
-        }
-        
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
-        }
-        
-        .warning {
-            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
-            border: 2px solid #f39c12;
-            color: #856404;
-            padding: 1.5rem;
-            border-radius: 0.75rem;
+
+        .method-selector {
+            display: flex;
+            gap: 1rem;
             margin-bottom: 2rem;
-            font-size: 0.9rem;
-            box-shadow: 0 5px 15px rgba(243, 156, 18, 0.1);
+            background: #f8f9fa;
+            padding: 0.25rem;
+            border-radius: 12px;
         }
-        
+
+        .method-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            background: transparent;
+            color: #6c757d;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+
+        .method-btn.active {
+            background: white;
+            color: #3f755f;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .google-btn {
             width: 100%;
-            background: white;
-            border: 2px solid #e0e0e0;
-            color: #3c4043;
-            font-weight: 600;
-            padding: 0.75rem 1rem;
-            border-radius: 0.75rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.75rem;
-            position: relative;
-            overflow: hidden;
+            padding: 0.875rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            background: white;
+            color: #3c4043;
+            font-weight: 500;
             font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 1.5rem;
         }
-        
-        .google-btn svg {
-            width: 1.25rem;
-            height: 1.25rem;
-        }
-        
+
         .google-btn:hover {
             border-color: #dadce0;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
         }
-        
-        .google-btn:active {
-            transform: translateY(0);
+
+        .google-btn svg {
+            width: 20px;
+            height: 20px;
         }
-        
-        .divider {
-            position: relative;
-            text-align: center;
-            margin: 2rem 0;
+
+        .form-group {
+            margin-bottom: 1.5rem;
         }
-        
-        .divider::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: #e0e0e0;
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2c3330;
+            font-weight: 500;
+            font-size: 0.875rem;
         }
-        
-        .divider span {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 0 1rem;
-            color: #666;
-            font-size: 0.9rem;
-            position: relative;
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background: white;
         }
-        
-        .space-y-4 > * + * {
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3f755f;
+            box-shadow: 0 0 0 3px rgba(63, 117, 95, 0.1);
+        }
+
+        .form-input.error {
+            border-color: #dc3545;
+        }
+
+        .error-text {
+            color: #dc3545;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .error-text.show {
+            display: block;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 0.875rem;
+            background: linear-gradient(135deg, #e4c342 0%, #d4c332 100%);
+            color: #3f755f;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
             margin-top: 1rem;
         }
-        
-        .animate-spin {
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(228, 195, 66, 0.3);
+        }
+
+        .btn-primary:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .loading {
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-        
+
+        .loading.show {
+            display: inline-block;
+        }
+
         @keyframes spin {
-            from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
+        }
+
+        .btn-text {
+            transition: opacity 0.2s;
+        }
+
+        .btn-text.loading {
+            opacity: 0;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0.5rem;
+            }
+            
+            .header {
+                padding: 1.5rem;
+            }
+            
+            .content {
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="setup-container">
-        <h1 class="setup-title">🔐 Admin Setup</h1>
-        
-        <div class="warning">
-            <strong>⚠️ Wichtig:</strong> Diese Seite ist nur für die initiale Einrichtung von Admin-Benutzern. Nach der Einrichtung sollte diese Seite nicht mehr öffentlich zugänglich gemacht werden.
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <div class="lock-icon">🔐</div>
+                <h1>Admin Setup</h1>
+                <p>Erstellen Sie Ihren Admin-Zugang für #HBS2026</p>
+            </div>
+            
+            <div class="content">
+                <div class="method-selector">
+                    <button class="method-btn active" onclick="switchMethod('google')">Google</button>
+                    <button class="method-btn" onclick="switchMethod('email')">Email</button>
+                </div>
+
+                <div id="alert" class="alert"></div>
+
+                <!-- Google Sign-In Section -->
+                <div id="google-section" class="form-section active">
+                    <button onclick="signInWithGoogle()" class="google-btn">
+                        <svg viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        <span>Mit Google fortfahren</span>
+                    </button>
+                </div>
+
+                <!-- Email Sign-In Section -->
+                <div id="email-section" class="form-section">
+                    <form id="emailForm">
+                        <div class="form-group">
+                            <label class="form-label" for="email">Email-Adresse</label>
+                            <input type="email" id="email" class="form-input" placeholder="admin@hbs2026.local" required>
+                            <div class="error-text" id="email-error"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="password">Passwort</label>
+                            <input type="password" id="password" class="form-input" placeholder="Mindestens 6 Zeichen" required>
+                            <div class="error-text" id="password-error"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="confirmPassword">Passwort bestätigen</label>
+                            <input type="password" id="confirmPassword" class="form-input" placeholder="Passwort wiederholen" required>
+                            <div class="error-text" id="confirm-error"></div>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary" id="submitBtn">
+                            <span class="btn-text">Admin erstellen</span>
+                            <div class="loading"></div>
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
-
-        <div class="space-y-4">
-            <button type="button" onclick="signInWithGoogle()" id="googleSetupBtn" class="google-btn">
-                <svg class="w-5 h-5" viewBox="0 0 24 24">
-                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                </svg>
-                🔑 Mit Google anmelden
-            </button>
-
-            <div class="divider">
-                <span>oder</span>
-            </div>
-        </div>
-
-        <form id="setupForm">
-            <div class="form-group">
-                <label class="form-label" for="email">Admin Email</label>
-                <input type="email" id="email" class="form-input" placeholder="admin@hbs2026.local" required>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label" for="password">Passwort</label>
-                <input type="password" id="password" class="form-input" placeholder="Sicheres Passwort wählen" required>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label" for="confirmPassword">Passwort bestätigen</label>
-                <input type="password" id="confirmPassword" class="form-input" placeholder="Passwort wiederholen" required>
-            </div>
-            
-            <button type="submit" class="btn-setup" id="setupBtn">Admin Benutzer erstellen</button>
-        </form>
-        
-        <div id="message"></div>
     </div>
 
     <!-- Firebase SDK -->
@@ -344,118 +374,149 @@
             prompt: 'select_account'
         });
 
-        // Google Sign-In
-        async function signInWithGoogle() {
-            const setupBtn = document.getElementById('googleSetupBtn');
-            const messageDiv = document.getElementById('message');
+        // UI Functions
+        function switchMethod(method) {
+            const buttons = document.querySelectorAll('.method-btn');
+            const sections = document.querySelectorAll('.form-section');
             
-            // Disable button and show loading
-            setupBtn.disabled = true;
-            setupBtn.innerHTML = `
-                <svg class="animate-spin h-5 w-5 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-            `;
-            messageDiv.innerHTML = '';
+            buttons.forEach(btn => btn.classList.remove('active'));
+            sections.forEach(section => section.classList.remove('active'));
             
-            try {
-                const result = await auth.signInWithPopup(googleProvider);
-                const user = result.user;
-                
-                console.log('Google sign-in successful:', user);
-                
-                messageDiv.innerHTML = `
-                    <div class="success-message">
-                        ✅ Admin Benutzer mit Google erfolgreich erstellt!<br>
-                        Email: ${user.email}<br>
-                        Name: ${user.displayName}<br>
-                        Sie können sich jetzt in der Hauptanwendung anmelden.
-                    </div>
-                `;
-                
-                // Clear form
-                document.getElementById('setupForm').reset();
-                
-            } catch (error) {
-                console.error('Google sign-in error:', error);
-                let errorMessage = 'Fehler bei Google-Anmeldung!';
-                
-                if (error.code === 'auth/popup-closed-by-user') {
-                    errorMessage = 'Anmeldung wurde abgebrochen.';
-                } else if (error.code === 'auth/popup-blocked') {
-                    errorMessage = 'Popup wurde blockiert. Bitte erlauben Sie Popups.';
-                } else if (error.code === 'auth/cancelled-popup-request') {
-                    errorMessage = 'Anmeldung wurde abgebrochen.';
-                }
-                
-                messageDiv.innerHTML = `<div class="error-message">${errorMessage}</div>`;
-            } finally {
-                // Re-enable button
-                setupBtn.disabled = false;
-                setupBtn.innerHTML = '🔑 Mit Google anmelden';
+            if (method === 'google') {
+                buttons[0].classList.add('active');
+                document.getElementById('google-section').classList.add('active');
+            } else {
+                buttons[1].classList.add('active');
+                document.getElementById('email-section').classList.add('active');
+            }
+            
+            hideAlert();
+        }
+
+        function showAlert(message, type) {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = `alert alert-${type} show`;
+        }
+
+        function hideAlert() {
+            const alert = document.getElementById('alert');
+            alert.classList.remove('show');
+        }
+
+        function setLoading(loading) {
+            const btn = document.getElementById('submitBtn');
+            const btnText = btn.querySelector('.btn-text');
+            const loadingSpinner = btn.querySelector('.loading');
+            
+            if (loading) {
+                btn.disabled = true;
+                btnText.classList.add('loading');
+                loadingSpinner.classList.add('show');
+            } else {
+                btn.disabled = false;
+                btnText.classList.remove('loading');
+                loadingSpinner.classList.remove('show');
             }
         }
 
-        // Form submission
-        document.getElementById('setupForm').addEventListener('submit', async (e) => {
+        function showError(fieldId, message) {
+            const field = document.getElementById(fieldId);
+            const error = document.getElementById(fieldId + '-error');
+            
+            field.classList.add('error');
+            error.textContent = message;
+            error.classList.add('show');
+        }
+
+        function hideError(fieldId) {
+            const field = document.getElementById(fieldId);
+            const error = document.getElementById(fieldId + '-error');
+            
+            field.classList.remove('error');
+            error.classList.remove('show');
+        }
+
+        function clearErrors() {
+            ['email', 'password', 'confirmPassword'].forEach(id => hideError(id));
+        }
+
+        // Google Sign-In
+        async function signInWithGoogle() {
+            try {
+                showAlert('Verbindung mit Google wird hergestellt...', 'warning');
+                
+                const result = await auth.signInWithPopup(googleProvider);
+                const user = result.user;
+                
+                showAlert(`✅ Admin erstellt! Email: ${user.email}`, 'success');
+                
+                // Clear form if visible
+                document.getElementById('emailForm').reset();
+                
+            } catch (error) {
+                console.error('Google sign-in error:', error);
+                let errorMessage = 'Anmeldung fehlgeschlagen';
+                
+                if (error.code === 'auth/popup-closed-by-user') {
+                    errorMessage = 'Anmeldung abgebrochen';
+                } else if (error.code === 'auth/popup-blocked') {
+                    errorMessage = 'Popup blockiert. Bitte erlauben Sie Popups.';
+                }
+                
+                showAlert(errorMessage, 'error');
+            }
+        }
+
+        // Email Form Submission
+        document.getElementById('emailForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
-            const setupBtn = document.getElementById('setupBtn');
-            const messageDiv = document.getElementById('message');
+            
+            clearErrors();
             
             // Validation
-            if (password !== confirmPassword) {
-                messageDiv.innerHTML = '<div class="error-message">Passwörter stimmen nicht überein!</div>';
-                return;
-            }
+            let hasError = false;
             
             if (password.length < 6) {
-                messageDiv.innerHTML = '<div class="error-message">Passwort muss mindestens 6 Zeichen lang sein!</div>';
-                return;
+                showError('password', 'Passwort muss mindestens 6 Zeichen lang sein');
+                hasError = true;
             }
             
-            // Disable button and show loading
-            setupBtn.disabled = true;
-            setupBtn.textContent = 'Wird erstellt...';
-            messageDiv.innerHTML = '';
+            if (password !== confirmPassword) {
+                showError('confirmPassword', 'Passwörter stimmen nicht überein');
+                hasError = true;
+            }
+            
+            if (hasError) return;
             
             try {
-                // Create user with Firebase Auth
+                setLoading(true);
+                hideAlert();
+                
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                console.log('Admin user created:', userCredential.user);
                 
-                messageDiv.innerHTML = `
-                    <div class="success-message">
-                        ✅ Admin Benutzer erfolgreich erstellt!<br>
-                        Email: ${email}<br>
-                        Sie können sich jetzt in der Hauptanwendung anmelden.
-                    </div>
-                `;
-                
-                // Clear form
-                document.getElementById('setupForm').reset();
+                showAlert(`✅ Admin erstellt! Email: ${email}`, 'success');
+                document.getElementById('emailForm').reset();
                 
             } catch (error) {
                 console.error('Error creating user:', error);
-                let errorMessage = 'Fehler beim Erstellen des Benutzers!';
+                let errorMessage = 'Fehler beim Erstellen des Admin-Benutzers';
                 
                 if (error.code === 'auth/email-already-in-use') {
-                    errorMessage = 'Diese Email wird bereits verwendet!';
+                    showError('email', 'Email wird bereits verwendet');
                 } else if (error.code === 'auth/weak-password') {
-                    errorMessage = 'Passwort ist zu schwach!';
+                    showError('password', 'Passwort ist zu schwach');
                 } else if (error.code === 'auth/invalid-email') {
-                    errorMessage = 'Ungültige Email-Adresse!';
+                    showError('email', 'Ungültige Email-Adresse');
+                } else {
+                    showAlert(errorMessage, 'error');
                 }
-                
-                messageDiv.innerHTML = `<div class="error-message">${errorMessage}</div>`;
             } finally {
-                // Re-enable button
-                setupBtn.disabled = false;
-                setupBtn.textContent = 'Admin Benutzer erstellen';
+                setLoading(false);
             }
         });
     </script>
