@@ -37,6 +37,91 @@ function initializeFirebase() {
     }
 }
 
+// Global functions that check Firebase availability
+async function addClub() {
+    if (!db) {
+        console.error('Firebase not initialized');
+        alert('Firebase nicht verfügbar. Bitte Seite neu laden.');
+        return;
+    }
+    
+    const input = document.getElementById('clubName');
+    if (!input.value.trim()) return;
+    
+    const newClub = {
+        name: input.value.trim().toUpperCase(),
+        points: 0
+    };
+    
+    await saveClub(newClub);
+    input.value = '';
+}
+
+async function addPoints(id, pts) {
+    if (!db) {
+        console.error('Firebase not initialized');
+        alert('Firebase nicht verfügbar. Bitte Seite neu laden.');
+        return;
+    }
+    
+    const club = clubs.find(x => x.id === id);
+    if (club) {
+        club.points += pts;
+        await saveClub(club);
+    }
+}
+
+async function renameClub(id) {
+    if (!db) {
+        console.error('Firebase not initialized');
+        alert('Firebase nicht verfügbar. Bitte Seite neu laden.');
+        return;
+    }
+    
+    const club = clubs.find(x => x.id === id);
+    const newName = prompt("Vereinsname ändern:", club.name);
+    if (newName !== null && newName.trim() !== "") {
+        club.name = newName.trim().toUpperCase();
+        await saveClub(club);
+    }
+}
+
+async function confirmDelete(id) {
+    if (!db) {
+        console.error('Firebase not initialized');
+        alert('Firebase nicht verfügbar. Bitte Seite neu laden.');
+        return;
+    }
+    
+    if (deleteConfirmId === id) {
+        await deleteClub(id);
+        deleteConfirmId = null;
+    } else {
+        deleteConfirmId = id;
+        render();
+        // Reset after 3 seconds if not confirmed
+        setTimeout(() => { 
+            if(deleteConfirmId === id) { 
+                deleteConfirmId = null; 
+                render(); 
+            } 
+        }, 3000);
+    }
+}
+
+function switchTab(tab) {
+    const isAdmin = tab === 'admin';
+    document.getElementById('admin-tab').classList.toggle('hidden', !isAdmin);
+    document.getElementById('dashboard-tab').classList.toggle('hidden', isAdmin);
+    document.getElementById('btn-admin').className = isAdmin ? 
+        "px-5 py-2 rounded-lg text-sm font-bold bg-[#e4c342] text-[#3f755f]" : 
+        "px-5 py-2 rounded-lg text-sm font-bold text-white/50";
+    document.getElementById('btn-dashboard').className = !isAdmin ? 
+        "px-5 py-2 rounded-lg text-sm font-bold bg-[#e4c342] text-[#3f755f]" : 
+        "px-5 py-2 rounded-lg text-sm font-bold text-white/50";
+    render();
+}
+
 // Firebase functions
 async function loadClubs() {
     try {
@@ -104,67 +189,7 @@ function setupRealtimeListener() {
         });
 }
 
-// Application functions
-async function addClub() {
-    const input = document.getElementById('clubName');
-    if (!input.value.trim()) return;
-    
-    const newClub = {
-        name: input.value.trim().toUpperCase(),
-        points: 0
-    };
-    
-    await saveClub(newClub);
-    input.value = '';
-}
-
-async function addPoints(id, pts) {
-    const club = clubs.find(x => x.id === id);
-    if (club) {
-        club.points += pts;
-        await saveClub(club);
-    }
-}
-
-async function renameClub(id) {
-    const club = clubs.find(x => x.id === id);
-    const newName = prompt("Vereinsname ändern:", club.name);
-    if (newName !== null && newName.trim() !== "") {
-        club.name = newName.trim().toUpperCase();
-        await saveClub(club);
-    }
-}
-
-async function confirmDelete(id) {
-    if (deleteConfirmId === id) {
-        await deleteClub(id);
-        deleteConfirmId = null;
-    } else {
-        deleteConfirmId = id;
-        render();
-        // Reset after 3 seconds if not confirmed
-        setTimeout(() => { 
-            if(deleteConfirmId === id) { 
-                deleteConfirmId = null; 
-                render(); 
-            } 
-        }, 3000);
-    }
-}
-
-function switchTab(tab) {
-    const isAdmin = tab === 'admin';
-    document.getElementById('admin-tab').classList.toggle('hidden', !isAdmin);
-    document.getElementById('dashboard-tab').classList.toggle('hidden', isAdmin);
-    document.getElementById('btn-admin').className = isAdmin ? 
-        "px-5 py-2 rounded-lg text-sm font-bold bg-[#e4c342] text-[#3f755f]" : 
-        "px-5 py-2 rounded-lg text-sm font-bold text-white/50";
-    document.getElementById('btn-dashboard').className = !isAdmin ? 
-        "px-5 py-2 rounded-lg text-sm font-bold bg-[#e4c342] text-[#3f755f]" : 
-        "px-5 py-2 rounded-lg text-sm font-bold text-white/50";
-    render();
-}
-
+// Render function (used by both Firebase and global functions)
 function render() {
     const adminList = document.getElementById('admin-list');
     const rankingList = document.getElementById('ranking-list');
