@@ -15,6 +15,7 @@ const itemHeight = 64; // Reduced from 90 to fit condensed cards
 let unsubscribeClubs = null;
 let db = null;
 let auth = null; // Firebase Auth
+let googleProvider = null; // Google Auth Provider
 let isLoggedIn = false;
 let processingClicks = new Set(); // Track which buttons are being processed
 let showAllInDashboard = false; // Toggle for dashboard view
@@ -34,6 +35,13 @@ function initializeFirebase() {
         firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
         auth = firebase.auth(); // Initialize Auth
+        
+        // Set up Google Auth Provider
+        googleProvider = new firebase.auth.GoogleAuthProvider();
+        googleProvider.setCustomParameters({
+            prompt: 'select_account'
+        });
+        
         console.log('Firebase initialized successfully');
         return true;
     } catch (error) {
@@ -134,6 +142,46 @@ async function performLogin(email, password) {
             errorMessage = "Ungültige Email!";
         } else if (error.code === 'auth/too-many-requests') {
             errorMessage = "Zu viele Versuche. Bitte später erneut versuchen.";
+        }
+        
+        showLoginError(errorMessage);
+    } finally {
+        setLoginLoading(false);
+    }
+}
+
+// Google Sign-In function
+async function signInWithGoogle() {
+    try {
+        setLoginLoading(true);
+        showLoginError('');
+        
+        const result = await auth.signInWithPopup(googleProvider);
+        const user = result.user;
+        
+        console.log('Google sign-in successful:', user);
+        
+        isLoggedIn = true;
+        updateLoginUI();
+        closeLoginModal();
+        
+        // Switch to admin tab after successful login
+        document.getElementById('admin-tab').classList.remove('hidden');
+        document.getElementById('dashboard-tab').classList.add('hidden');
+        document.getElementById('btn-admin').className = "px-5 py-2 rounded-lg text-sm font-bold bg-[#e4c342] text-[#3f755f]";
+        document.getElementById('btn-dashboard').className = "px-5 py-2 rounded-lg text-sm font-bold text-white/50";
+        render();
+        
+    } catch (error) {
+        console.error('Google sign-in error:', error);
+        let errorMessage = 'Fehler bei Google-Anmeldung!';
+        
+        if (error.code === 'auth/popup-closed-by-user') {
+            errorMessage = 'Anmeldung wurde abgebrochen.';
+        } else if (error.code === 'auth/popup-blocked') {
+            errorMessage = 'Popup wurde blockiert. Bitte erlauben Sie Popups.';
+        } else if (error.code === 'auth/cancelled-popup-request') {
+            errorMessage = 'Anmeldung wurde abgebrochen.';
         }
         
         showLoginError(errorMessage);
