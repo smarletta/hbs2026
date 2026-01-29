@@ -1,6 +1,7 @@
 // Service Worker for HBS2026 PWA
 const CACHE_NAME = 'hbs2026-v1.0';
 const STATIC_CACHE = 'hbs2026-static-v1.0';
+const FIRESTORE_CACHE = 'hbs2026-firestore-v1.0';
 
 // Assets to cache immediately
 const STATIC_ASSETS = [
@@ -39,7 +40,7 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          if (cacheName !== STATIC_CACHE && cacheName !== CACHE_NAME) {
+          if (cacheName !== STATIC_CACHE && cacheName !== CACHE_NAME && cacheName !== FIRESTORE_CACHE) {
             console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
@@ -55,6 +56,40 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   // Only handle GET requests
   if (event.request.method !== 'GET') return;
+
+  // Handle Firebase Firestore requests specially
+  if (event.request.url.includes('firestore.googleapis.com')) {
+    event.respondWith(
+      caches.open(FIRESTORE_CACHE)
+        .then((cache) => {
+          return fetch(event.request)
+            .then((response) => {
+              // Cache successful Firestore responses
+              if (response.status === 200) {
+                cache.put(event.request, response.clone());
+              }
+              return response;
+            })
+            .catch(() => {
+              // Return cached Firestore data if network fails
+              return cache.match(event.request)
+                .then((cachedResponse) => {
+                  if (cachedResponse) {
+                    console.log('Serving Firestore data from cache');
+                    return cachedResponse;
+                  }
+                  // No cached data available
+                  return new Response(JSON.stringify({ error: 'Offline - no cached data available' }), {
+                    status: 503,
+                    statusText: 'Service Unavailable',
+                    headers: { 'Content-Type': 'application/json' }
+                  });
+                });
+            });
+        })
+    );
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request)
