@@ -1,4 +1,11 @@
-// Your web app's Firebase configuration
+// =====================================================
+// HBS2026 Live Scoring System - Firebase App Logic
+// =====================================================
+
+// ==================== CONFIGURATION ====================
+/**
+ * Firebase configuration for the HBS2026 application
+ */
 const firebaseConfig = {
   apiKey: "AIzaSyDaTFFp4XHAhYesmybpO7P-4n6M4cpGMWY",
   authDomain: "hbs2026-5d23d.firebaseapp.com",
@@ -8,7 +15,10 @@ const firebaseConfig = {
   appId: "1:901953520067:web:4ea76ea4900f9eb4953d76"
 };
 
-// Global variables
+// ==================== GLOBAL VARIABLES ====================
+/**
+ * Application state variables
+ */
 let clubs = [];
 let deleteConfirmId = null;
 const itemHeight = 128; // Increased to 128 to create 64px gap between cards
@@ -20,13 +30,20 @@ let isLoggedIn = false;
 let processingClicks = new Set(); // Track which buttons are being processed
 let showAllInDashboard = false; // Toggle for dashboard view
 
-// Performance optimization variables
+// ==================== PERFORMANCE OPTIMIZATION ====================
+/**
+ * Performance optimization variables for multi-user concurrency
+ */
 let renderTimeout = null;
 let lastRenderedClubs = [];
 let clubsCache = new Map(); // Client-side cache for club data
 let isLoading = true; // Loading state for skeleton display
 
-// Debounce function for batched rendering
+// ==================== UTILITY FUNCTIONS ====================
+/**
+ * Debounce function for batched rendering to reduce excessive re-renders
+ * @param {number} delay - Delay in milliseconds (default: 200ms)
+ */
 function debounceRender(delay = 200) {
     clearTimeout(renderTimeout);
     renderTimeout = setTimeout(() => {
@@ -34,7 +51,7 @@ function debounceRender(delay = 200) {
     }, delay);
 }
 
-// Initialize Firebase when DOM is ready
+// ==================== FIREBASE INITIALIZATION ====================
 function initializeFirebase() {
     console.log('Checking Firebase availability...');
     
@@ -60,11 +77,15 @@ function initializeFirebase() {
         return true;
     } catch (error) {
         console.error('Firebase initialization error:', error);
+        showUserError('Firebase konnte nicht geladen werden. Bitte Seite neu laden.');
         return false;
     }
 }
 
-// Modal functions
+// ==================== MODAL FUNCTIONS ====================
+/**
+ * Shows the login modal with animations
+ */
 function showLoginModal() {
     const modal = document.getElementById('loginModal');
     const modalContent = document.getElementById('loginModalContent');
@@ -103,6 +124,15 @@ function showLoginError(message) {
     errorDiv.classList.remove('hidden');
 }
 
+/**
+ * Shows a user-friendly error message
+ * @param {string} message - Error message to display
+ */
+function showUserError(message) {
+    // Use alert for now, could be enhanced to use toast notifications
+    alert(`Fehler: ${message}`);
+}
+
 function setLoginLoading(loading) {
     const submitBtn = document.getElementById('loginSubmitBtn');
     const btnText = document.getElementById('loginBtnText');
@@ -119,7 +149,9 @@ function setLoginLoading(loading) {
     }
 }
 
-// Login system with Firebase Authentication and modern modal
+/**
+ * Shows the login modal and prompts for authentication
+ */
 async function login() {
     showLoginModal();
 }
@@ -230,6 +262,7 @@ function updateLoginUI() {
     }
 }
 
+// ==================== CLUB MANAGEMENT FUNCTIONS ====================
 // Global functions that check Firebase availability
 async function addClub() {
     if (!isLoggedIn) {
@@ -403,7 +436,7 @@ function toggleDashboardView() {
     render();
 }
 
-// Firebase functions
+// ==================== UI RENDERING FUNCTIONS ====================
 async function loadClubs() {
     try {
         isLoading = true;
@@ -469,7 +502,7 @@ async function deleteClub(clubId) {
     }
 }
 
-// Real-time listener
+// ==================== FIREBASE FUNCTIONS ====================
 function setupRealtimeListener() {
     unsubscribeClubs = db.collection('clubs').orderBy('points', 'desc')
         .onSnapshot((snapshot) => {
@@ -580,7 +613,7 @@ function render() {
     }
 }
 
-// Countdown Timer
+// ==================== COUNTDOWN FUNCTIONS ====================
 function updateCountdown() {
     const now = new Date();
     const saturday = new Date();
@@ -604,7 +637,7 @@ function updateCountdown() {
     document.getElementById('countdown-seconds').textContent = String(seconds).padStart(2, '0');
 }
 
-// Initialize application
+// ==================== INITIALIZATION ====================
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('DOM loaded, starting initialization...');
     
