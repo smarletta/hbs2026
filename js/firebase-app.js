@@ -11,7 +11,7 @@ const firebaseConfig = {
 // Global variables
 let clubs = [];
 let deleteConfirmId = null;
-const itemHeight = 64; // Reduced from 90 to fit condensed cards
+const itemHeight = 80; // Increased to 80 to add space between cards
 let unsubscribeClubs = null;
 let db = null;
 let auth = null; // Firebase Auth
@@ -499,7 +499,7 @@ function render() {
         el.dataset.points = c.points;
         el.style.transform = `translateY(${index * itemHeight}px)`;
         el.innerHTML = `
-            <div class="rank-box flex items-center h-20 rounded-2xl px-6 relative overflow-hidden transition-all duration-300">
+            <div class="rank-box flex items-center rounded-2xl px-6 relative overflow-hidden transition-all duration-300">
                 <div class="w-10 text-3xl font-black ${index < 3 ? 'gold-text' : 'text-white/20'} italic">${index + 1}</div>
                 <div class="flex-1 text-white font-bold text-xl uppercase tracking-tight truncate ml-4">${c.name}</div>
                 <div class="text-4xl font-black gold-text ${pointsChanged ? 'animate-pop' : ''}">${c.points}</div>

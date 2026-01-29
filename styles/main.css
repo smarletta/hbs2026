@@ -40,8 +40,8 @@ main {
     background: linear-gradient(135deg, var(--tannengruen) 0%, var(--tannengruen-dark) 100%);
     border-bottom: 4px solid var(--gold);
     box-shadow: 0 12px 24px -8px rgba(63, 117, 95, 0.4);
-    height: 60px; /* Reduced from 80px */
-    padding: 0.75rem 1.5rem; /* Reduced padding */
+    height: 64px;
+    padding: 0 1.5rem;
 }
 
 @keyframes point-pop {
