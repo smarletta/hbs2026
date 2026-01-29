@@ -21,7 +21,7 @@ const firebaseConfig = {
  */
 let clubs = [];
 let deleteConfirmId = null;
-const itemHeight = 96; // Reduced from 128 to create 32px gap between cards
+const itemHeight = 84; // Reduced from 96 to create 20px gap between cards
 let unsubscribeClubs = null;
 let db = null;
 let auth = null; // Firebase Auth
