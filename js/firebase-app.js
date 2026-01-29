@@ -636,7 +636,78 @@ function updateCountdown() {
     document.getElementById('countdown-seconds').textContent = String(seconds).padStart(2, '0');
 }
 
-// ==================== INITIALIZATION ====================
+// ==================== PWA INSTALL PROMPT ====================
+// Handle PWA install prompt
+let deferredPrompt;
+let installButton = null;
+
+// Detect install prompt availability
+window.addEventListener('beforeinstallprompt', (e) => {
+  console.log('Install prompt available');
+  // Prevent the default browser install prompt
+  e.preventDefault();
+  // Store the event for later use
+  deferredPrompt = e;
+  
+  // Show custom install button
+  showInstallButton();
+});
+
+// Handle successful installation
+window.addEventListener('appinstalled', (e) => {
+  console.log('PWA installed successfully');
+  // Hide install button
+  hideInstallButton();
+  // Clear the deferred prompt
+  deferredPrompt = null;
+});
+
+// Create and show install button
+function showInstallButton() {
+  if (installButton) return; // Already showing
+  
+  installButton = document.createElement('button');
+  installButton.innerHTML = '📱 App Installieren';
+  installButton.className = 'fixed bottom-4 right-4 bg-[#e4c342] text-[#3f755f] font-bold py-3 px-6 rounded-full shadow-lg hover:bg-[#d4c332] transition-all duration-200 z-50 animate-bounce';
+  installButton.onclick = installPWA;
+  
+  document.body.appendChild(installButton);
+  
+  // Auto-hide after 10 seconds
+  setTimeout(() => {
+    hideInstallButton();
+  }, 10000);
+}
+
+// Hide install button
+function hideInstallButton() {
+  if (installButton) {
+    installButton.remove();
+    installButton = null;
+  }
+}
+
+// Handle install button click
+async function installPWA() {
+  if (!deferredPrompt) {
+    console.log('No install prompt available');
+    return;
+  }
+  
+  // Show the install prompt
+  deferredPrompt.prompt();
+  
+  // Wait for the user to respond to the prompt
+  const { outcome } = await deferredPrompt.userChoice;
+  
+  console.log('Install outcome:', outcome);
+  
+  // Clear the deferred prompt
+  deferredPrompt = null;
+  
+  // Hide the install button
+  hideInstallButton();
+}
 // Register service worker for PWA (independent of DOM ready)
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
