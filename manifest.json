@@ -1,0 +1,26 @@
+{
+  "name": "#HBS2026 Live Scoring",
+  "short_name": "HBS2026",
+  "description": "Live scoring system for Kickacher Waldbadhexen events",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fdfaf1",
+  "theme_color": "#3f755f",
+  "orientation": "portrait-primary",
+  "categories": ["sports", "productivity"],
+  "lang": "de",
+  "icons": [
+    {
+      "src": "icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
