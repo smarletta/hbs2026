@@ -14,6 +14,8 @@ let deleteConfirmId = null;
 const itemHeight = 90;
 let unsubscribeClubs = null;
 let db = null;
+let isLoggedIn = false;
+let processingClicks = new Set(); // Track which buttons are being processed
 
 // Initialize Firebase when DOM is ready
 function initializeFirebase() {
@@ -37,8 +39,48 @@ function initializeFirebase() {
     }
 }
 
+// Login system
+function login() {
+    const password = prompt("Admin-Passwort eingeben:");
+    if (password === "hbs2026") {
+        isLoggedIn = true;
+        updateLoginUI();
+        render();
+        alert("Login erfolgreich!");
+    } else if (password !== null) {
+        alert("Falsches Passwort!");
+    }
+}
+
+function logout() {
+    isLoggedIn = false;
+    updateLoginUI();
+    switchTab('dashboard'); // Switch to dashboard on logout
+}
+
+function updateLoginUI() {
+    const adminBtn = document.getElementById('btn-admin');
+    const logoutBtn = document.getElementById('btn-logout');
+    
+    if (isLoggedIn) {
+        adminBtn.innerHTML = "ADMIN ✓";
+        adminBtn.classList.add("bg-green-600");
+        logoutBtn.classList.remove("hidden");
+    } else {
+        adminBtn.innerHTML = "ADMIN";
+        adminBtn.classList.remove("bg-green-600");
+        logoutBtn.classList.add("hidden");
+    }
+}
+
 // Global functions that check Firebase availability
 async function addClub() {
+    if (!isLoggedIn) {
+        alert("Bitte zuerst einloggen!");
+        login();
+        return;
+    }
+    
     if (!db) {
         console.error('Firebase not initialized');
         alert('Firebase nicht verfügbar. Bitte Seite neu laden.');
@@ -58,20 +100,48 @@ async function addClub() {
 }
 
 async function addPoints(id, pts) {
+    if (!isLoggedIn) {
+        alert("Bitte zuerst einloggen!");
+        login();
+        return;
+    }
+    
     if (!db) {
         console.error('Firebase not initialized');
         alert('Firebase nicht verfügbar. Bitte Seite neu laden.');
         return;
     }
     
-    const club = clubs.find(x => x.id === id);
-    if (club) {
-        club.points += pts;
-        await saveClub(club);
+    // Prevent multiple clicks on the same button
+    const clickKey = `${id}-${pts}`;
+    if (processingClicks.has(clickKey)) {
+        console.log('Click already being processed:', clickKey);
+        return;
+    }
+    
+    processingClicks.add(clickKey);
+    
+    try {
+        const club = clubs.find(x => x.id === id);
+        if (club) {
+            club.points += pts;
+            await saveClub(club);
+        }
+    } finally {
+        // Remove from processing set after a short delay
+        setTimeout(() => {
+            processingClicks.delete(clickKey);
+        }, 500);
     }
 }
 
 async function renameClub(id) {
+    if (!isLoggedIn) {
+        alert("Bitte zuerst einloggen!");
+        login();
+        return;
+    }
+    
     if (!db) {
         console.error('Firebase not initialized');
         alert('Firebase nicht verfügbar. Bitte Seite neu laden.');
@@ -87,6 +157,12 @@ async function renameClub(id) {
 }
 
 async function confirmDelete(id) {
+    if (!isLoggedIn) {
+        alert("Bitte zuerst einloggen!");
+        login();
+        return;
+    }
+    
     if (!db) {
         console.error('Firebase not initialized');
         alert('Firebase nicht verfügbar. Bitte Seite neu laden.');
@@ -111,6 +187,13 @@ async function confirmDelete(id) {
 
 function switchTab(tab) {
     const isAdmin = tab === 'admin';
+    
+    // Check login for admin tab
+    if (isAdmin && !isLoggedIn) {
+        login();
+        return;
+    }
+    
     document.getElementById('admin-tab').classList.toggle('hidden', !isAdmin);
     document.getElementById('dashboard-tab').classList.toggle('hidden', isAdmin);
     document.getElementById('btn-admin').className = isAdmin ? 
@@ -271,6 +354,9 @@ function updateCountdown() {
 // Initialize application
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('DOM loaded, starting initialization...');
+    
+    // Initialize login UI
+    updateLoginUI();
     
     // Initialize Firebase first
     const firebaseReady = initializeFirebase();
