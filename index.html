@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>#HBS2026 Live-Scoring</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --tannengruen: #3f755f;
+            --tannengruen-dark: #2c5243;
+            --gold: #e4c342;
+            --naturweiss: #fdfaf1;
+            --dunkelschiefer: #2c3330;
+        }
+
+        body {
+            background-color: var(--naturweiss);
+            color: var(--dunkelschiefer);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
+
+        #ranking-list { position: relative; transition: height 0.5s ease; }
+        .ranking-item {
+            position: absolute; left: 0; right: 0;
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            padding: 0 1rem;
+        }
+
+        .rank-box {
+            background: linear-gradient(135deg, var(--tannengruen) 0%, var(--tannengruen-dark) 100%);
+            border-bottom: 4px solid var(--gold);
+            box-shadow: 0 12px 24px -8px rgba(63, 117, 95, 0.4);
+        }
+
+        @keyframes point-pop {
+            0% { transform: scale(1); color: var(--gold); }
+            50% { transform: scale(1.4); color: white; text-shadow: 0 0 20px var(--gold); }
+            100% { transform: scale(1); color: var(--gold); }
+        }
+        .animate-pop { animation: point-pop 0.6s ease-out; }
+        .gold-text { color: var(--gold); }
+        .glass-card { background: white; border: 1px solid rgba(63, 117, 95, 0.1); box-shadow: 0 8px 25px rgba(44, 51, 48, 0.08); }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <nav class="sticky top-0 z-50 bg-[#3f755f] py-4 px-6 shadow-2xl border-b-4 border-[#e4c342]">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div>
+                <span class="text-[#e4c342] text-[10px] font-bold tracking-[0.3em] uppercase opacity-80 block">Kickacher Waldbadhexen</span>
+                <h1 class="text-white text-3xl font-extrabold tracking-tighter">#HBS2026</h1>
+            </div>
+            <div class="flex bg-black/20 p-1 rounded-xl">
+                <button onclick="switchTab('admin')" id="btn-admin" class="px-5 py-2 rounded-lg text-sm font-bold transition-all text-white/50">ADMIN</button>
+                <button onclick="switchTab('dashboard')" id="btn-dashboard" class="px-5 py-2 rounded-lg text-sm font-bold bg-[#e4c342] text-[#3f755f]">LIVE</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="py-6 px-4">
+        
+        <div id="admin-tab" class="hidden max-w-2xl mx-auto space-y-6">
+            <div class="glass-card p-6 rounded-3xl">
+                <h2 class="text-xs font-black text-[#3f755f] uppercase tracking-widest mb-3 text-center">Neuer Verein</h2>
+                <div class="flex gap-2">
+                    <input type="text" id="clubName" placeholder="Name..." class="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-[#3f755f]">
+                    <button onclick="addClub()" class="bg-[#e4c342] text-[#3f755f] px-6 py-3 rounded-xl font-black shadow-md">ADD</button>
+                </div>
+            </div>
+            <div id="admin-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </div>
+
+        <div id="dashboard-tab" class="max-w-3xl mx-auto">
+            <div id="ranking-list"></div>
+        </div>
+
+    </main>
+
+    <script>
+        let clubs = JSON.parse(localStorage.getItem('hexen_clubs')) || [];
+        let deleteConfirmId = null;
+        const itemHeight = 90;
+
+        function save() {
+            localStorage.setItem('hexen_clubs', JSON.stringify(clubs));
+            render();
+        }
+
+        function addClub() {
+            const input = document.getElementById('clubName');
+            if (!input.value.trim()) return;
+            clubs.push({ id: Date.now(), name: input.value.trim().toUpperCase(), points: 0 });
+            input.value = '';
+            save();
+        }
+
+        function addPoints(id, pts) {
+            const c = clubs.find(x => x.id === id);
+            if (c) { c.points += pts; save(); }
+        }
+
+        function renameClub(id) {
+            const c = clubs.find(x => x.id === id);
+            const newName = prompt("Vereinsname ändern:", c.name);
+            if (newName !== null && newName.trim() !== "") {
+                c.name = newName.trim().toUpperCase();
+                save();
+            }
+        }
+
+        function confirmDelete(id) {
+            if (deleteConfirmId === id) {
+                clubs = clubs.filter(x => x.id !== id);
+                deleteConfirmId = null;
+                save();
+            } else {
+                deleteConfirmId = id;
+                render();
+                // Nach 3 Sekunden Reset, wenn nicht bestätigt wurde
+                setTimeout(() => { if(deleteConfirmId === id) { deleteConfirmId = null; render(); } }, 3000);
+            }
+        }
+
+        function switchTab(tab) {
+            const isAdmin = tab === 'admin';
+            document.getElementById('admin-tab').classList.toggle('hidden', !isAdmin);
+            document.getElementById('dashboard-tab').classList.toggle('hidden', isAdmin);
+            document.getElementById('btn-admin').className = isAdmin ? "px-5 py-2 rounded-lg text-sm font-bold bg-[#e4c342] text-[#3f755f]" : "px-5 py-2 rounded-lg text-sm font-bold text-white/50";
+            document.getElementById('btn-dashboard').className = !isAdmin ? "px-5 py-2 rounded-lg text-sm font-bold bg-[#e4c342] text-[#3f755f]" : "px-5 py-2 rounded-lg text-sm font-bold text-white/50";
+            render();
+        }
+
+        function render() {
+            const adminList = document.getElementById('admin-list');
+            const rankingList = document.getElementById('ranking-list');
+
+            // Admin Rendering
+            adminList.innerHTML = clubs.map(c => `
+                <div class="glass-card p-4 rounded-2xl flex flex-col gap-3 border-l-4 border-[#3f755f]">
+                    <div class="flex justify-between items-center px-1">
+                        <span class="font-bold truncate text-[#2c3330] uppercase text-sm flex-1">${c.name}</span>
+                        <div class="flex gap-2">
+                             <button onclick="renameClub(${c.id})" class="text-gray-400 hover:text-[#3f755f]">✎</button>
+                             <button onclick="confirmDelete(${c.id})" class="text-xs px-2 py-1 rounded transition-colors ${deleteConfirmId === c.id ? 'bg-red-600 text-white font-bold' : 'text-gray-300 hover:text-red-500'}">
+                                ${deleteConfirmId === c.id ? 'SICHER?' : '✕'}
+                             </button>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="addPoints(${c.id}, 1)" class="flex-1 bg-gray-100 py-3 rounded-xl font-bold text-sm hover:bg-gray-200">+1</button>
+                        <button onclick="addPoints(${c.id}, 3)" class="flex-1 bg-[#e4c342]/20 border border-[#e4c342] py-3 rounded-xl font-bold text-sm hover:bg-[#e4c342]/40">+3</button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Dashboard Rendering
+            const sorted = [...clubs].sort((a, b) => b.points - a.points);
+            rankingList.style.height = `${sorted.length * itemHeight}px`;
+
+            sorted.forEach((c, index) => {
+                let el = rankingList.querySelector(`[data-id="${c.id}"]`);
+                const isNew = !el;
+                if (isNew) {
+                    el = document.createElement('div');
+                    el.dataset.id = c.id;
+                    el.dataset.points = c.points;
+                    el.className = 'ranking-item';
+                    rankingList.appendChild(el);
+                }
+                const pointsChanged = !isNew && parseInt(el.dataset.points) !== c.points;
+                el.dataset.points = c.points;
+                el.style.transform = `translateY(${index * itemHeight}px)`;
+                el.innerHTML = `
+                    <div class="rank-box flex items-center h-20 rounded-2xl px-6 relative overflow-hidden transition-all duration-300">
+                        <div class="w-10 text-3xl font-black ${index < 3 ? 'gold-text' : 'text-white/20'} italic">${index + 1}</div>
+                        <div class="flex-1 text-white font-bold text-xl uppercase tracking-tight truncate ml-4">${c.name}</div>
+                        <div class="text-4xl font-black gold-text ${pointsChanged ? 'animate-pop' : ''}">${c.points}</div>
+                    </div>
+                `;
+            });
+
+            Array.from(rankingList.children).forEach(child => {
+                if (!sorted.find(c => c.id.toString() === child.dataset.id)) child.remove();
+            });
+        }
+
+        window.addEventListener('storage', (e) => { if (e.key === 'hexen_clubs') { clubs = JSON.parse(e.newValue); render(); } });
+        setInterval(() => {
+            const data = JSON.parse(localStorage.getItem('hexen_clubs')) || [];
+            if (JSON.stringify(data) !== JSON.stringify(clubs)) { clubs = data; render(); }
+        }, 800);
+        render();
+    </script>
+</body>
+</html>
