@@ -295,7 +295,7 @@ function render() {
     const adminList = document.getElementById('admin-list');
     const rankingList = document.getElementById('ranking-list');
 
-    // Admin Rendering
+    // Admin Rendering - show all clubs for admin
     adminList.innerHTML = clubs.map(c => `
         <div class="glass-card p-4 rounded-2xl flex flex-col gap-3 border-l-4 border-[#3f755f]">
             <div class="flex justify-between items-center px-1">
@@ -314,11 +314,12 @@ function render() {
         </div>
     `).join('');
 
-    // Dashboard Rendering
+    // Dashboard Rendering - show only top 10 clubs
     const sorted = [...clubs].sort((a, b) => b.points - a.points);
-    rankingList.style.height = `${sorted.length * itemHeight}px`;
+    const top10 = sorted.slice(0, 10); // Limit to top 10
+    rankingList.style.height = `${top10.length * itemHeight}px`;
 
-    sorted.forEach((c, index) => {
+    top10.forEach((c, index) => {
         let el = rankingList.querySelector(`[data-id="${c.id}"]`);
         const isNew = !el;
         if (isNew) {
@@ -340,8 +341,9 @@ function render() {
         `;
     });
 
+    // Remove elements that are no longer in top 10
     Array.from(rankingList.children).forEach(child => {
-        if (!sorted.find(c => c.id === child.dataset.id)) child.remove();
+        if (!top10.find(c => c.id === child.dataset.id)) child.remove();
     });
 }
 
@@ -360,7 +362,7 @@ function updateCountdown() {
     
     const updatedDiff = saturday - now;
     const totalHours = Math.floor(updatedDiff / (1000 * 60 * 60));
-    const hours = totalHours % 24;
+    const hours = totalHours; // Show total hours, not modulo 24
     const minutes = Math.floor((updatedDiff % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((updatedDiff % (1000 * 60)) / 1000);
     
