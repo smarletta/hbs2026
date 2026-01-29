@@ -24,6 +24,7 @@ let showAllInDashboard = false; // Toggle for dashboard view
 let renderTimeout = null;
 let lastRenderedClubs = [];
 let clubsCache = new Map(); // Client-side cache for club data
+let isLoading = true; // Loading state for skeleton display
 
 // Debounce function for batched rendering
 function debounceRender(delay = 200) {
@@ -405,9 +406,13 @@ function toggleDashboardView() {
 // Firebase functions
 async function loadClubs() {
     try {
+        isLoading = true;
+        debounceRender();
+        
         // Check cache first
         if (clubsCache.size > 0) {
             clubs = Array.from(clubsCache.values());
+            isLoading = false;
             debounceRender();
             return;
         }
@@ -419,11 +424,13 @@ async function loadClubs() {
         clubsCache.clear();
         clubs.forEach(club => clubsCache.set(club.id, club));
         
+        isLoading = false;
         debounceRender();
     } catch (error) {
         console.error('Error loading clubs:', error);
         // Fallback to localStorage if Firebase fails
         clubs = JSON.parse(localStorage.getItem('hexen_clubs')) || [];
+        isLoading = false;
         debounceRender();
     }
 }
@@ -531,32 +538,46 @@ function render() {
     const displayClubs = (isLoggedIn && showAllInDashboard) ? sorted : sorted.slice(0, 10);
     rankingList.style.height = `${displayClubs.length * itemHeight}px`;
 
-    displayClubs.forEach((c, index) => {
-        let el = rankingList.querySelector(`[data-id="${c.id}"]`);
-        const isNew = !el;
-        if (isNew) {
-            el = document.createElement('div');
-            el.dataset.id = c.id;
-            el.dataset.points = c.points;
-            el.className = 'ranking-item';
-            rankingList.appendChild(el);
-        }
-        const pointsChanged = !isNew && parseInt(el.dataset.points) !== c.points;
-        el.dataset.points = c.points;
-        el.style.transform = `translateY(${index * itemHeight}px)`;
-        el.innerHTML = `
-            <div class="rank-box flex items-center rounded-2xl px-6 relative overflow-hidden transition-all duration-300">
-                <div class="w-10 text-3xl font-black ${index < 3 ? 'gold-text' : 'text-white/20'} italic">${index + 1}</div>
-                <div class="flex-1 text-white font-bold text-xl uppercase tracking-tight truncate ml-4">${c.name}</div>
-                <div class="text-4xl font-black gold-text ${pointsChanged ? 'animate-pop' : ''}">${c.points}</div>
+    if (isLoading && displayClubs.length === 0) {
+        // Show skeleton loaders
+        rankingList.innerHTML = Array(10).fill().map((_, index) => `
+            <div class="ranking-item fade-in" style="transform: translateY(${index * itemHeight}px)">
+                <div class="skeleton-card">
+                    <div class="rank skeleton"></div>
+                    <div class="name skeleton"></div>
+                    <div class="points skeleton"></div>
+                </div>
             </div>
-        `;
-    });
+        `).join('');
+    } else {
+        // Show real cards with slide-up animation
+        displayClubs.forEach((c, index) => {
+            let el = rankingList.querySelector(`[data-id="${c.id}"]`);
+            const isNew = !el;
+            if (isNew) {
+                el = document.createElement('div');
+                el.dataset.id = c.id;
+                el.dataset.points = c.points;
+                el.className = 'ranking-item slide-up';
+                rankingList.appendChild(el);
+            }
+            const pointsChanged = !isNew && parseInt(el.dataset.points) !== c.points;
+            el.dataset.points = c.points;
+            el.style.transform = `translateY(${index * itemHeight}px)`;
+            el.innerHTML = `
+                <div class="rank-box flex items-center rounded-2xl px-6 relative overflow-hidden transition-all duration-300">
+                    <div class="w-10 text-3xl font-black ${index < 3 ? 'gold-text' : 'text-white/20'} italic">${index + 1}</div>
+                    <div class="flex-1 text-white font-bold text-xl uppercase tracking-tight truncate ml-4">${c.name}</div>
+                    <div class="text-4xl font-black gold-text ${pointsChanged ? 'animate-pop' : ''}">${c.points}</div>
+                </div>
+            `;
+        });
 
-    // Remove elements that are no longer in display
-    Array.from(rankingList.children).forEach(child => {
-        if (!displayClubs.find(c => c.id === child.dataset.id)) child.remove();
-    });
+        // Remove elements that are no longer in display
+        Array.from(rankingList.children).forEach(child => {
+            if (!displayClubs.find(c => c.id === child.dataset.id)) child.remove();
+        });
+    }
 }
 
 // Countdown Timer
