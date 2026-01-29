@@ -36,6 +36,8 @@ let showAllInDashboard = false; // Toggle for dashboard view
  */
 let renderTimeout = null;
 let lastRenderedClubs = [];
+let lastRenderedShowAll = false;
+let clubsCache = new Map(); // Client-side cache for club data
 let isLoading = true; // Loading state for skeleton display
 
 // ==================== UTILITY FUNCTIONS ====================
@@ -536,12 +538,14 @@ function render() {
     // Skip if no clubs loaded
     if (!clubs || clubs.length === 0) return;
     
-    // Check if data has actually changed
+    // Check if data or display options actually changed
     const currentClubsStr = JSON.stringify(clubs);
-    if (currentClubsStr === JSON.stringify(lastRenderedClubs)) {
+    const currentShowAll = showAllInDashboard;
+    if (currentClubsStr === JSON.stringify(lastRenderedClubs) && currentShowAll === lastRenderedShowAll) {
         return; // No changes, skip render
     }
     lastRenderedClubs = [...clubs];
+    lastRenderedShowAll = currentShowAll;
     
     const adminList = document.getElementById('admin-list');
     const rankingList = document.getElementById('ranking-list');
