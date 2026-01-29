@@ -411,12 +411,16 @@ function switchTab(tab) {
         "px-5 py-2 rounded-lg text-sm font-bold bg-[#e4c342] text-[#3f755f]" : 
         "px-5 py-2 rounded-lg text-sm font-bold text-white/50";
     
-    // Hide/show countdown and footer in admin view
+    // Hide/show countdown, header-info and footer in admin view
     const countdownSection = document.querySelector('.countdown-section');
+    const headerInfo = document.querySelector('.header-info');
     const footer = document.querySelector('footer');
     
     if (countdownSection) {
         countdownSection.style.display = isAdmin ? 'none' : 'block';
+    }
+    if (headerInfo) {
+        headerInfo.style.display = isAdmin ? 'none' : 'block';
     }
     if (footer) {
         footer.style.display = isAdmin ? 'none' : 'block';
