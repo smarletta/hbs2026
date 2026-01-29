@@ -30,6 +30,9 @@ This project is deployed as a **GitHub Pages** static site. The application runs
 - Cross-tab synchronization
 - Smooth CSS animations and transitions
 - Mobile-responsive design
+- **Modular file structure** - Separated HTML, CSS, and JS
+- **Countdown timer** - Automatic countdown to Saturday 0:00
+- **Header info system** - Clear point achievement explanation
 
 ## 🎨 Design
 
@@ -61,6 +64,8 @@ The application uses a custom color scheme inspired by the event branding:
 2. Rankings update automatically in real-time
 3. Top 3 positions are highlighted with gold styling
 4. Point changes trigger smooth animations
+5. **Footer countdown** shows time until Saturday 0:00
+6. **Header info** explains the point system
 
 ## 🔧 Local Development
 
@@ -74,7 +79,11 @@ Since this is a static site, local development is straightforward:
 
 ```
 hbs2026/
-├── index.html          # Main application (HTML + CSS + JS)
+├── index.html          # Main HTML structure
+├── styles/
+│   └── main.css        # All CSS styles and animations
+├── js/
+│   └── app.js          # All JavaScript functionality
 ├── README.md           # This documentation
 └── .git/              # Git repository
 ```
