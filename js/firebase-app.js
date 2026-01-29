@@ -14,6 +14,7 @@ let deleteConfirmId = null;
 const itemHeight = 64; // Reduced from 90 to fit condensed cards
 let unsubscribeClubs = null;
 let db = null;
+let auth = null; // Firebase Auth
 let isLoggedIn = false;
 let processingClicks = new Set(); // Track which buttons are being processed
 let showAllInDashboard = false; // Toggle for dashboard view
@@ -32,6 +33,7 @@ function initializeFirebase() {
         console.log('Initializing Firebase...');
         firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
+        auth = firebase.auth(); // Initialize Auth
         console.log('Firebase initialized successfully');
         return true;
     } catch (error) {
@@ -40,10 +42,25 @@ function initializeFirebase() {
     }
 }
 
-// Login system
-function login() {
+// Login system with Firebase Authentication
+async function login() {
+    const email = prompt("Admin-Email eingeben:");
+    if (!email) return;
+    
     const password = prompt("Admin-Passwort eingeben:");
-    if (password === "hbs2026") {
+    if (!password) return;
+    
+    try {
+        // Show loading state
+        const adminBtn = document.getElementById('btn-admin');
+        const originalText = adminBtn.innerHTML;
+        adminBtn.innerHTML = "LADEN...";
+        adminBtn.disabled = true;
+        
+        // Sign in with Firebase Auth
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        console.log('Login successful:', userCredential.user);
+        
         isLoggedIn = true;
         updateLoginUI();
         // Switch to admin tab after successful login
@@ -53,15 +70,36 @@ function login() {
         document.getElementById('btn-dashboard').className = "px-5 py-2 rounded-lg text-sm font-bold text-white/50";
         render();
         alert("Login erfolgreich!");
-    } else if (password !== null) {
-        alert("Falsches Passwort!");
+        
+    } catch (error) {
+        console.error('Login error:', error);
+        let errorMessage = "Login fehlgeschlagen!";
+        
+        if (error.code === 'auth/user-not-found') {
+            errorMessage = "Benutzer nicht gefunden!";
+        } else if (error.code === 'auth/wrong-password') {
+            errorMessage = "Falsches Passwort!";
+        } else if (error.code === 'auth/invalid-email') {
+            errorMessage = "Ungültige Email!";
+        }
+        
+        alert(errorMessage);
+    } finally {
+        // Reset button state
+        adminBtn.innerHTML = originalText;
+        adminBtn.disabled = false;
     }
 }
 
 function logout() {
-    isLoggedIn = false;
-    updateLoginUI();
-    switchTab('dashboard'); // Switch to dashboard on logout
+    auth.signOut().then(() => {
+        console.log('Logout successful');
+        isLoggedIn = false;
+        updateLoginUI();
+        switchTab('dashboard'); // Switch to dashboard on logout
+    }).catch((error) => {
+        console.error('Logout error:', error);
+    });
 }
 
 function updateLoginUI() {
@@ -411,6 +449,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     const firebaseReady = initializeFirebase();
     
     if (firebaseReady) {
+        // Set up auth state listener for persistent sessions
+        auth.onAuthStateChanged((user) => {
+            console.log('Auth state changed:', user);
+            if (user) {
+                // User is signed in
+                isLoggedIn = true;
+                updateLoginUI();
+                console.log('User already logged in:', user.email);
+            } else {
+                // User is signed out
+                isLoggedIn = false;
+                updateLoginUI();
+                console.log('User is logged out');
+            }
+        });
+        
         // Load initial data and setup real-time listener
         await loadClubs();
         setupRealtimeListener();
