@@ -1,15 +1,15 @@
-// Firebase configuration - Replace with your config
+// Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    authDomain: "your-project-id.firebaseapp.com",
-    projectId: "your-project-id",
-    storageBucket: "your-project-id.appspot.com",
-    messagingSenderId: "123456789",
-    appId: "1:123456789:web:abcdef123456789"
+  apiKey: "AIzaSyDaTFFp4XHAhYesmybpO7P-4n6M4cpGMWY",
+  authDomain: "hbs2026-5d23d.firebaseapp.com",
+  projectId: "hbs2026-5d23d",
+  storageBucket: "hbs2026-5d23d.firebasestorage.app",
+  messagingSenderId: "901953520067",
+  appId: "1:901953520067:web:4ea76ea4900f9eb4953d76"
 };
 
 // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 // Global variables
