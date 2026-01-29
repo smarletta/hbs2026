@@ -131,6 +131,13 @@ async function addPoints(id, pts) {
     console.log('Processing click:', clickKey);
     processingClicks.add(clickKey);
     
+    // Add visual feedback - disable the button
+    const button = document.querySelector(`button[onclick="addPoints('${id}', ${pts})"]`);
+    if (button) {
+        button.disabled = true;
+        button.classList.add('opacity-50', 'cursor-not-allowed');
+    }
+    
     try {
         const club = clubs.find(x => x.id === id);
         if (club) {
@@ -143,6 +150,12 @@ async function addPoints(id, pts) {
         setTimeout(() => {
             processingClicks.delete(clickKey);
             console.log('Click processing completed:', clickKey);
+            
+            // Re-enable the button
+            if (button) {
+                button.disabled = false;
+                button.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
         }, 500);
     }
 }
@@ -313,19 +326,19 @@ function render() {
 
     // Admin Rendering - show all clubs for admin
     adminList.innerHTML = clubs.map(c => `
-        <div class="glass-card p-4 rounded-2xl flex flex-col gap-3 border-l-4 border-[#3f755f]">
+        <div class="glass-card p-3 rounded-xl flex flex-col gap-2 border-l-4 border-[#3f755f]">
             <div class="flex justify-between items-center px-1">
-                <span class="font-bold truncate text-[#2c3330] uppercase text-sm flex-1">${c.name}</span>
-                <div class="flex gap-2">
-                     <button onclick="renameClub('${c.id}')" class="text-gray-400 hover:text-[#3f755f]">✎</button>
-                     <button onclick="confirmDelete('${c.id}')" class="text-xs px-2 py-1 rounded transition-colors ${deleteConfirmId === c.id ? 'bg-red-600 text-white font-bold' : 'text-gray-300 hover:text-red-500'}">
+                <span class="font-bold truncate text-[#2c3330] uppercase text-xs flex-1">${c.name}</span>
+                <div class="flex gap-1">
+                     <button onclick="renameClub('${c.id}')" class="text-gray-400 hover:text-[#3f755f] text-sm">✎</button>
+                     <button onclick="confirmDelete('${c.id}')" class="text-xs px-1 py-1 rounded transition-colors ${deleteConfirmId === c.id ? 'bg-red-600 text-white font-bold' : 'text-gray-300 hover:text-red-500'}">
                         ${deleteConfirmId === c.id ? 'SICHER?' : '✕'}
                      </button>
                 </div>
             </div>
             <div class="flex gap-2">
-                <button onclick="addPoints('${c.id}', 1)" class="flex-1 bg-gray-100 py-3 rounded-xl font-bold text-sm hover:bg-gray-200">+1</button>
-                <button onclick="addPoints('${c.id}', 3)" class="flex-1 bg-[#e4c342]/20 border border-[#e4c342] py-3 rounded-xl font-bold text-sm hover:bg-[#e4c342]/40">+3</button>
+                <button onclick="addPoints('${c.id}', 1)" class="flex-1 bg-gray-100 py-2 rounded-lg font-bold text-xs hover:bg-gray-200">+1</button>
+                <button onclick="addPoints('${c.id}', 3)" class="flex-1 bg-[#e4c342]/20 border border-[#e4c342] py-2 rounded-lg font-bold text-xs hover:bg-[#e4c342]/40">+3</button>
             </div>
         </div>
     `).join('');
