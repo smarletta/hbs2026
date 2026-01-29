@@ -1,0 +1,12 @@
+# Firebase Security Rules for HBS2026 Live-Scoring
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Clubs collection - read/write access for all users
+    match /clubs/{clubId} {
+      allow read, write: if true;
+    }
+  }
+}
