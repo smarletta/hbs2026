@@ -20,6 +20,19 @@ let isLoggedIn = false;
 let processingClicks = new Set(); // Track which buttons are being processed
 let showAllInDashboard = false; // Toggle for dashboard view
 
+// Performance optimization variables
+let renderTimeout = null;
+let lastRenderedClubs = [];
+let clubsCache = new Map(); // Client-side cache for club data
+
+// Debounce function for batched rendering
+function debounceRender(delay = 200) {
+    clearTimeout(renderTimeout);
+    renderTimeout = setTimeout(() => {
+        render();
+    }, delay);
+}
+
 // Initialize Firebase when DOM is ready
 function initializeFirebase() {
     console.log('Checking Firebase availability...');
@@ -392,14 +405,26 @@ function toggleDashboardView() {
 // Firebase functions
 async function loadClubs() {
     try {
+        // Check cache first
+        if (clubsCache.size > 0) {
+            clubs = Array.from(clubsCache.values());
+            debounceRender();
+            return;
+        }
+        
         const snapshot = await db.collection('clubs').orderBy('points', 'desc').get();
         clubs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        render();
+        
+        // Populate cache
+        clubsCache.clear();
+        clubs.forEach(club => clubsCache.set(club.id, club));
+        
+        debounceRender();
     } catch (error) {
         console.error('Error loading clubs:', error);
         // Fallback to localStorage if Firebase fails
         clubs = JSON.parse(localStorage.getItem('hexen_clubs')) || [];
-        render();
+        debounceRender();
     }
 }
 
@@ -441,8 +466,19 @@ async function deleteClub(clubId) {
 function setupRealtimeListener() {
     unsubscribeClubs = db.collection('clubs').orderBy('points', 'desc')
         .onSnapshot((snapshot) => {
-            clubs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            render();
+            const newClubs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            
+            // Check if data actually changed before triggering render
+            const hasChanged = JSON.stringify(newClubs) !== JSON.stringify(clubs);
+            
+            if (hasChanged) {
+                clubs = newClubs;
+                // Cache the data
+                clubsCache.clear();
+                clubs.forEach(club => clubsCache.set(club.id, club));
+                // Use debounced rendering for performance
+                debounceRender();
+            }
         }, (error) => {
             console.error('Real-time listener error:', error);
             // Fallback to polling localStorage
@@ -450,7 +486,7 @@ function setupRealtimeListener() {
                 const data = JSON.parse(localStorage.getItem('hexen_clubs')) || [];
                 if (JSON.stringify(data) !== JSON.stringify(clubs)) { 
                     clubs = data; 
-                    render(); 
+                    debounceRender(); 
                 }
             }, 800);
         });
@@ -458,6 +494,16 @@ function setupRealtimeListener() {
 
 // Render function (used by both Firebase and global functions)
 function render() {
+    // Skip if no clubs loaded
+    if (!clubs || clubs.length === 0) return;
+    
+    // Check if data has actually changed
+    const currentClubsStr = JSON.stringify(clubs);
+    if (currentClubsStr === JSON.stringify(lastRenderedClubs)) {
+        return; // No changes, skip render
+    }
+    lastRenderedClubs = [...clubs];
+    
     const adminList = document.getElementById('admin-list');
     const rankingList = document.getElementById('ranking-list');
 
