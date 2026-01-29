@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Setup - #HBS2026</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #3f755f 0%, #2c5243 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .setup-container {
+            background: white;
+            padding: 3rem;
+            border-radius: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+            border: 4px solid #e4c342;
+        }
+        .setup-title {
+            color: #3f755f;
+            font-size: 2rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-label {
+            display: block;
+            color: #2c3330;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #3f755f;
+        }
+        .btn-setup {
+            width: 100%;
+            background: #e4c342;
+            color: #3f755f;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 800;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-setup:hover {
+            background: #d4b332;
+            transform: translateY(-2px);
+        }
+        .btn-setup:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .success-message {
+            background: #4caf50;
+            color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+        .error-message {
+            background: #f44336;
+            color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="setup-container">
+        <h1 class="setup-title">🔐 Admin Setup</h1>
+        
+        <div class="warning">
+            <strong>⚠️ Wichtig:</strong> Diese Seite ist nur für die initiale Einrichtung von Admin-Benutzern. Nach der Einrichtung sollte diese Seite nicht mehr öffentlich zugänglich gemacht werden.
+        </div>
+
+        <form id="setupForm">
+            <div class="form-group">
+                <label class="form-label" for="email">Admin Email</label>
+                <input type="email" id="email" class="form-input" placeholder="admin@hbs2026.local" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="password">Passwort</label>
+                <input type="password" id="password" class="form-input" placeholder="Sicheres Passwort wählen" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="confirmPassword">Passwort bestätigen</label>
+                <input type="password" id="confirmPassword" class="form-input" placeholder="Passwort wiederholen" required>
+            </div>
+            
+            <button type="submit" class="btn-setup" id="setupBtn">Admin Benutzer erstellen</button>
+        </form>
+        
+        <div id="message"></div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDaTFFp4XHAhYesmybpO7P-4n6M4cpGMWY",
+            authDomain: "hbs2026-5d23d.firebaseapp.com",
+            projectId: "hbs2026-5d23d",
+            storageBucket: "hbs2026-5d23d.firebasestorage.app",
+            messagingSenderId: "901953520067",
+            appId: "1:901953520067:web:4ea76ea4900f9eb4953d76"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // Form submission
+        document.getElementById('setupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const setupBtn = document.getElementById('setupBtn');
+            const messageDiv = document.getElementById('message');
+            
+            // Validation
+            if (password !== confirmPassword) {
+                messageDiv.innerHTML = '<div class="error-message">Passwörter stimmen nicht überein!</div>';
+                return;
+            }
+            
+            if (password.length < 6) {
+                messageDiv.innerHTML = '<div class="error-message">Passwort muss mindestens 6 Zeichen lang sein!</div>';
+                return;
+            }
+            
+            // Disable button and show loading
+            setupBtn.disabled = true;
+            setupBtn.textContent = 'Wird erstellt...';
+            messageDiv.innerHTML = '';
+            
+            try {
+                // Create user with Firebase Auth
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                console.log('Admin user created:', userCredential.user);
+                
+                messageDiv.innerHTML = `
+                    <div class="success-message">
+                        ✅ Admin Benutzer erfolgreich erstellt!<br>
+                        Email: ${email}<br>
+                        Sie können sich jetzt in der Hauptanwendung anmelden.
+                    </div>
+                `;
+                
+                // Clear form
+                document.getElementById('setupForm').reset();
+                
+            } catch (error) {
+                console.error('Error creating user:', error);
+                let errorMessage = 'Fehler beim Erstellen des Benutzers!';
+                
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMessage = 'Diese Email wird bereits verwendet!';
+                } else if (error.code === 'auth/weak-password') {
+                    errorMessage = 'Passwort ist zu schwach!';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = 'Ungültige Email-Adresse!';
+                }
+                
+                messageDiv.innerHTML = `<div class="error-message">${errorMessage}</div>`;
+            } finally {
+                // Re-enable button
+                setupBtn.disabled = false;
+                setupBtn.textContent = 'Admin Benutzer erstellen';
+            }
+        });
+    </script>
+</body>
+</html>

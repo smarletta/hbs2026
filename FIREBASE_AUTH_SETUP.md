@@ -16,6 +16,15 @@ This guide explains how to set up Firebase Authentication for the #HBS2026 Live-
 6. Click **Enable** and save
 
 ## Step 2: Create Admin User
+You have two options to create the admin user:
+
+### Option A: Use Hidden Setup Page (Recommended)
+1. Go to: `https://smarletta.github.io/hbs2026/admin-setup.html`
+2. Enter admin email and secure password
+3. Click "Admin Benutzer erstellen"
+4. User will be created automatically
+
+### Option B: Use Firebase Console
 1. In Authentication section, click **Users** tab
 2. Click **Add user**
 3. Enter admin email and password:
