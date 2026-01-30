@@ -3,13 +3,26 @@ const CACHE_NAME = 'hbs2026-v1.0';
 const STATIC_CACHE = 'hbs2026-static-v1.0';
 const FIRESTORE_CACHE = 'hbs2026-firestore-v1.0';
 
+// Detect environment
+const isLocalhost = self.location.hostname === 'localhost';
+
 // Assets to cache immediately
-const STATIC_ASSETS = [
+const STATIC_ASSETS = isLocalhost ? [
   '/',
   '/index.html',
   '/styles/main.css',
   '/js/firebase-app.js',
   '/manifest.json',
+  'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap',
+  'https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js',
+  'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js',
+  'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js'
+] : [
+  './',
+  './index.html',
+  './styles/main.css',
+  './js/firebase-app.js',
+  './manifest.json',
   'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap',
   'https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js',
   'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js',
