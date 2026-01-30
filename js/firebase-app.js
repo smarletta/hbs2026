@@ -497,7 +497,8 @@ async function confirmDelete(id) {
         } catch (error) {
             console.error('Delete failed:', error);
             alert('Löschen fehlgeschlagen: ' + error.message);
-            // Don't reset deleteConfirmId, so user can try again
+            deleteConfirmId = null;
+            render();
         }
     } else {
         deleteConfirmId = id;
