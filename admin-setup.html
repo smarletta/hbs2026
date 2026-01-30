@@ -449,16 +449,10 @@
                 const result = await auth.signInWithPopup(googleProvider);
                 const user = result.user;
                 
-                // Check if this is a new user (creation time equals last sign in time)
-                if (user.metadata.creationTime === user.metadata.lastSignInTime) {
-                    // New user, delete and show error
-                    await user.delete();
-                    showAlert('Benutzer existiert nicht. Bitte kontaktieren Sie den Admin.', 'error');
-                } else {
-                    showAlert(`✅ Eingeloggt! Email: ${user.email}`, 'success');
-                    // Clear form if visible
-                    document.getElementById('emailForm').reset();
-                }
+                showAlert(`✅ Admin erstellt! Email: ${user.email}`, 'success');
+                
+                // Clear form if visible
+                document.getElementById('emailForm').reset();
                 
             } catch (error) {
                 console.error('Google sign-in error:', error);
