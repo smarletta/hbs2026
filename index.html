@@ -15,16 +15,19 @@
 </head>
 <body class="min-h-screen">
 
-    <nav class="bg-[#3f755f] text-white py-4 px-4">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="flex items-center space-x-2">
-                <h1 class="text-xl font-bold">#HBS2026</h1>
-                <span class="text-sm opacity-75">Live Scoring</span>
+    <nav class="sticky top-0 z-50 bg-[#3f755f] py-4 px-6 shadow-2xl border-b-4 border-[#e4c342]">
+        <div class="header-info">
+            <p>Punktevergabe: <span>+1 für 10 Shots</span> | <span>+3 für 1 Meter Bar-Getränke</span></p>
+        </div>
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div>
+                <span class="text-[#e4c342] text-[10px] font-bold tracking-[0.3em] uppercase opacity-80 block">Kickacher Waldbadhexen</span>
+                <h1 class="text-white text-3xl font-extrabold tracking-tighter">#HBS2026</h1>
             </div>
-            <div class="flex space-x-2">
-                <button onclick="switchTab('admin')" id="btn-admin" class="px-5 py-2 rounded-lg text-sm font-bold bg-[#e4c342] text-[#3f755f]">ADMIN</button>
-                <button onclick="switchTab('dashboard')" id="btn-dashboard" class="px-5 py-2 rounded-lg text-sm font-bold text-white/50">LIVE</button>
-                <button onclick="logout()" class="px-5 py-2 rounded-lg text-sm font-bold bg-red-500 text-white hover:bg-red-600">LOGOUT</button>
+            <div class="flex bg-black/20 p-1 rounded-xl gap-2">
+                <button onclick="switchTab('admin')" id="btn-admin" class="px-5 py-2 rounded-lg text-sm font-bold transition-all text-white/50">ADMIN</button>
+                <button onclick="switchTab('dashboard')" id="btn-dashboard" class="px-5 py-2 rounded-lg text-sm font-bold bg-[#e4c342] text-[#3f755f]">LIVE</button>
+                <button onclick="logout()" id="btn-logout" class="px-3 py-2 rounded-lg text-sm font-bold bg-red-600 text-white hidden">LOGOUT</button>
             </div>
         </div>
     </nav>
