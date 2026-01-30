@@ -37,9 +37,46 @@ function applyConfiguration() {
  */
 function applyColorPalette() {
   const root = document.documentElement;
+  
+  // Set primary colors
   root.style.setProperty('--color-primary', config.colors.primary);
+  const primaryDark = darkenColor(config.colors.primary, 25); // 25% darker
+  root.style.setProperty('--color-primary-dark', primaryDark);
+  
+  // Set other colors
   root.style.setProperty('--color-secondary', config.colors.secondary);
   root.style.setProperty('--color-accent', config.colors.accent);
+}
+
+/**
+ * Darken a hex color by a percentage
+ * @param {string} hex - Hex color (with or without #)
+ * @param {number} percent - Percentage to darken (0-100)
+ * @returns {string} Darkened hex color
+ */
+function darkenColor(hex, percent) {
+  // Remove # if present
+  hex = hex.replace(/^#/, '');
+  
+  // Handle 8-digit hex (with alpha) by taking first 6 digits
+  if (hex.length === 8) {
+    hex = hex.substring(0, 6);
+  }
+  
+  // Parse r, g, b values
+  const num = parseInt(hex, 16);
+  const r = (num >> 16) & 255;
+  const g = (num >> 8) & 255;
+  const b = num & 255;
+  
+  // Darken by reducing brightness
+  const factor = 1 - (percent / 100);
+  const newR = Math.max(0, Math.floor(r * factor));
+  const newG = Math.max(0, Math.floor(g * factor));
+  const newB = Math.max(0, Math.floor(b * factor));
+  
+  // Convert back to hex
+  return `#${((newR << 16) | (newG << 8) | newB).toString(16).padStart(6, '0')}`;
 }
 
 /**
