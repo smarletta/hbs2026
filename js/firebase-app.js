@@ -490,8 +490,15 @@ async function confirmDelete(id) {
     }
     
     if (deleteConfirmId === id) {
-        await deleteClub(id);
-        deleteConfirmId = null;
+        try {
+            await deleteClub(id);
+            deleteConfirmId = null;
+            render();
+        } catch (error) {
+            console.error('Delete failed:', error);
+            alert('Löschen fehlgeschlagen: ' + error.message);
+            // Don't reset deleteConfirmId, so user can try again
+        }
     } else {
         deleteConfirmId = id;
         render();
@@ -606,14 +613,7 @@ async function saveClub(club) {
 }
 
 async function deleteClub(clubId) {
-    try {
-        await db.collection('clubs').doc(clubId).delete();
-    } catch (error) {
-        console.error('Error deleting club:', error);
-        // Fallback to localStorage
-        clubs = clubs.filter(x => x.id !== clubId);
-        localStorage.setItem('hexen_clubs', JSON.stringify(clubs));
-    }
+    await db.collection('clubs').doc(clubId).delete();
 }
 
 // ==================== FIREBASE FUNCTIONS ====================
