@@ -224,3 +224,8 @@ main {
 .nav-border { border-bottom-color: var(--color-secondary); }
 .nav-button-bg { background-color: var(--color-secondary); }
 .nav-button-text { color: var(--color-primary); }
+
+/* Configurable Text Colors */
+.header-subtitle-color { color: var(--color-secondary); }
+.footer-hashtag-color { color: var(--color-secondary); }
+.text-dynamic { color: var(--color-text); }

@@ -52,6 +52,7 @@ function applyColorPalette() {
   // Set other colors
   root.style.setProperty('--color-secondary', config.colors.secondary);
   root.style.setProperty('--color-accent', config.colors.accent);
+  root.style.setProperty('--color-text', config.colors.text);
 }
 
 /**
@@ -96,7 +97,8 @@ const config = {
   colors: {
     primary: '#3f755f',
     secondary: '#e4c342',
-    accent: '#f97316'
+    accent: '#f97316',
+    text: '#000000'
   }
 };
 
@@ -703,7 +705,7 @@ function render() {
             el.innerHTML = `
                 <div class="rank-box flex items-center rounded-2xl px-6 relative overflow-hidden transition-all duration-300">
                     <div class="w-10 text-3xl font-black ${index < 3 ? 'gold-text' : 'text-white/20'} italic">${index + 1}</div>
-                    <div class="flex-1 text-white font-bold text-xl uppercase tracking-tight truncate ml-4">${c.name}</div>
+                    <div class="flex-1 text-dynamic font-bold text-xl uppercase tracking-tight truncate ml-4">${c.name}</div>
                     <div class="text-4xl font-black gold-text ${pointsChanged ? 'animate-pop' : ''}">${c.points}</div>
                 </div>
             `;
