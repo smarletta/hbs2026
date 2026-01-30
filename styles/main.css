@@ -1,7 +1,10 @@
 :root {
-    --tannengruen: #3f755f;
-    --tannengruen-dark: #2c5243;
-    --gold: #e4c342;
+    --color-primary: #3f755f;
+    --color-secondary: #e4c342;
+    --color-accent: #f97316;
+    --tannengruen: var(--color-primary);
+    --tannengruen-dark: #2c5243; /* Can be calculated from primary if needed */
+    --gold: var(--color-secondary);
     --naturweiss: #fdfaf1;
     --dunkelschiefer: #2c3330;
 }
