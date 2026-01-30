@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Club Registration - #HBS2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #3f755f 0%, #2c5243 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #3f755f 0%, #2c5243 100%);
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.875rem;
+        }
+
+        .lock-icon {
+            width: 48px;
+            height: 48px;
+            background: #e4c342;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2c3330;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3f755f;
+            box-shadow: 0 0 0 3px rgba(63, 117, 95, 0.1);
+        }
+
+        .form-input.error {
+            border-color: #dc3545;
+        }
+
+        .error-text {
+            color: #dc3545;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .error-text.show {
+            display: block;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 0.875rem;
+            background: linear-gradient(135deg, #e4c342 0%, #d4c332 100%);
+            color: #3f755f;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 1rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(228, 195, 66, 0.3);
+        }
+
+        .btn-primary:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .loading {
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading.show {
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .btn-text {
+            transition: opacity 0.2s;
+        }
+
+        .btn-text.loading {
+            opacity: 0;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0.5rem;
+            }
+            
+            .header {
+                padding: 1.5rem;
+            }
+            
+            .content {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <div class="lock-icon">🏆</div>
+                <h1>Club Registration</h1>
+                <p>Registriere deinen Verein für #HBS2026</p>
+            </div>
+            
+            <div class="content">
+                <div id="alert" class="alert"></div>
+
+                <form id="clubForm">
+                    <div class="form-group">
+                        <label class="form-label" for="clubName">Vereinsname</label>
+                        <input type="text" id="clubName" class="form-input" placeholder="Dein Vereinsname" required>
+                        <div class="error-text" id="clubName-error"></div>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary" id="submitBtn">
+                        <span class="btn-text">Verein registrieren</span>
+                        <div class="loading"></div>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDaTFFp4XHAhYesmybpO7P-4n6M4cpGMWY",
+            authDomain: "hbs2026-5d23d.firebaseapp.com",
+            projectId: "hbs2026-5d23d",
+            storageBucket: "hbs2026-5d23d.firebasestorage.app",
+            messagingSenderId: "901953520067",
+            appId: "1:901953520067:web:4ea76ea4900f9eb4953d76"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // UI Functions
+        function showAlert(message, type) {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = `alert alert-${type} show`;
+        }
+
+        function hideAlert() {
+            const alert = document.getElementById('alert');
+            alert.classList.remove('show');
+        }
+
+        function setLoading(loading) {
+            const btn = document.getElementById('submitBtn');
+            const btnText = btn.querySelector('.btn-text');
+            const loadingSpinner = btn.querySelector('.loading');
+            
+            if (loading) {
+                btn.disabled = true;
+                btnText.classList.add('loading');
+                loadingSpinner.classList.add('show');
+            } else {
+                btn.disabled = false;
+                btnText.classList.remove('loading');
+                loadingSpinner.classList.remove('show');
+            }
+        }
+
+        function showError(fieldId, message) {
+            const field = document.getElementById(fieldId);
+            const error = document.getElementById(fieldId + '-error');
+            
+            field.classList.add('error');
+            error.textContent = message;
+            error.classList.add('show');
+        }
+
+        function hideError(fieldId) {
+            const field = document.getElementById(fieldId);
+            const error = document.getElementById(fieldId + '-error');
+            
+            field.classList.remove('error');
+            error.classList.remove('show');
+        }
+
+        function clearErrors() {
+            hideError('clubName');
+        }
+
+        // Form Submission
+        document.getElementById('clubForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const clubName = document.getElementById('clubName').value.trim().toUpperCase();
+            
+            clearErrors();
+            
+            // Validation
+            let hasError = false;
+            
+            if (!clubName) {
+                showError('clubName', 'Vereinsname ist erforderlich');
+                hasError = true;
+            } else if (clubName.length < 2) {
+                showError('clubName', 'Vereinsname muss mindestens 2 Zeichen lang sein');
+                hasError = true;
+            }
+            
+            if (hasError) return;
+            
+            try {
+                setLoading(true);
+                hideAlert();
+                
+                // Check if device already registered a club
+                if (localStorage.getItem('clubRegistered')) {
+                    showAlert('Von diesem Gerät wurde bereits ein Verein registriert.', 'error');
+                    return;
+                }
+                
+                // Check if club name already exists
+                const existingClubs = await db.collection('clubs').where('name', '==', clubName).get();
+                if (!existingClubs.empty) {
+                    showError('clubName', 'Dieser Vereinsname ist bereits vergeben');
+                    return;
+                }
+                
+                // Register the club
+                await db.collection('clubs').add({
+                    name: clubName,
+                    points: 0
+                });
+                
+                // Mark device as registered
+                localStorage.setItem('clubRegistered', 'true');
+                
+                showAlert(`✅ Verein "${clubName}" erfolgreich registriert!`, 'success');
+                document.getElementById('clubForm').reset();
+                
+            } catch (error) {
+                console.error('Registration error:', error);
+                showAlert('Fehler bei der Registrierung. Bitte versuche es erneut.', 'error');
+            } finally {
+                setLoading(false);
+            }
+        });
+    </script>
+</body>
+</html>
