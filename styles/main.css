@@ -219,17 +219,8 @@ main {
     font-weight: 700;
 }
 
-/* Responsive */
-@media (max-width: 640px) {
-    .countdown {
-        gap: 1rem;
-    }
-    
-    .countdown-number {
-        font-size: 2rem;
-    }
-    
-    .countdown-item {
-        min-width: 50px;
-    }
-}
+/* Configurable Navigation Colors */
+.nav-bg { background-color: var(--color-primary); }
+.nav-border { border-bottom-color: var(--color-secondary); }
+.nav-button-bg { background-color: var(--color-secondary); }
+.nav-button-text { color: var(--color-primary); }

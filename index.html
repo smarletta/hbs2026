@@ -15,7 +15,7 @@
 </head>
 <body class="min-h-screen">
 
-    <nav class="sticky top-0 z-50 bg-[#3f755f] py-4 px-6 shadow-2xl border-b-4 border-[#e4c342]">
+    <nav class="sticky top-0 z-50 nav-bg py-4 px-6 shadow-2xl border-b-4 nav-border">
         <div class="header-info">
             <p>Punktevergabe: <span>+1 für 10 Shots</span> | <span>+3 für 1 Meter Bar-Getränke</span></p>
         </div>
@@ -26,7 +26,7 @@
             </div>
             <div class="flex bg-black/20 p-1 rounded-xl gap-2">
                 <button onclick="switchTab('admin')" id="btn-admin" class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all text-white/50">ADMIN</button>
-                <button onclick="switchTab('dashboard')" id="btn-dashboard" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-[#e4c342] text-[#3f755f]">LIVE</button>
+                <button onclick="switchTab('dashboard')" id="btn-dashboard" class="px-4 py-1.5 rounded-lg text-xs font-bold nav-button-bg nav-button-text">LIVE</button>
                 <button onclick="logout()" id="btn-logout" class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-red-600 text-white hidden">LOGOUT</button>
             </div>
         </div>
