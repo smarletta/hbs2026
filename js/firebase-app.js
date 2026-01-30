@@ -16,6 +16,12 @@ function applyConfiguration() {
     mainHeading.textContent = `#${config.hashtag}`;
   }
   
+  // Apply header subtitle
+  const headerSubtitle = document.querySelector('nav .max-w-5xl > div > span:first-child');
+  if (headerSubtitle) {
+    headerSubtitle.textContent = config.headerSubtitle;
+  }
+  
   // Apply hashtag to footer
   const footerHeading = document.querySelector('footer h3');
   if (footerHeading) {
@@ -86,6 +92,7 @@ const config = {
   hashtag: 'HBS2026',
   countdownEndDate: '2026-01-31T00:00:00', // ISO format
   pointsText: 'Punktevergabe: <span>+1 für 10 Shots</span> | <span>+3 für 1 Meter Bar-Getränke</span>',
+  headerSubtitle: 'NZ Henkerhaus Baienfurt',
   colors: {
     primary: '#3f755f',
     secondary: '#e4c342',
@@ -112,6 +119,7 @@ const firebaseConfig = {
  */
 let clubs = [];
 let deleteConfirmId = null;
+let currentTab = 'dashboard'; // Track current active tab
 const itemHeight = 72;
 let unsubscribeClubs = null;
 let db = null;
@@ -418,6 +426,7 @@ async function addPoints(id, pts) {
         if (club) {
             club.points += pts;
             await saveClub(club);
+            render(); // Update UI immediately
             console.log('Points added successfully:', club);
         }
     } finally {
@@ -453,6 +462,7 @@ async function renameClub(id) {
     if (newName !== null && newName.trim() !== "") {
         club.name = newName.trim().toUpperCase();
         await saveClub(club);
+        render(); // Update UI immediately
     }
 }
 
@@ -805,7 +815,8 @@ async function installPWA() {
 // Register service worker for PWA (independent of DOM ready)
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/hbs2026/sw.js')
+        const swPath = location.hostname === 'localhost' ? '/sw.js' : '/hbs2026/sw.js';
+        navigator.serviceWorker.register(swPath)
             .then((registration) => {
                 console.log('Service Worker registered successfully:', registration.scope);
             })
