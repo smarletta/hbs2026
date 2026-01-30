@@ -306,10 +306,10 @@ async function signInWithGoogle() {
         const result = await auth.signInWithPopup(googleProvider);
         const user = result.user;
         
-        // Check if this is a new user (creation time equals last sign in time)
+        // Check if this is a new user
         if (user.metadata.creationTime === user.metadata.lastSignInTime) {
-            // New user, delete and show error
-            await user.delete();
+            // New user, sign out and show error
+            await auth.signOut();
             showLoginError('Benutzer existiert nicht. Bitte kontaktieren Sie den Admin.');
             return;
         }
