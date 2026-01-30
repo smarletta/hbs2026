@@ -389,20 +389,33 @@ async function addClub() {
     const input = document.getElementById('clubName');
     if (!input.value.trim()) return;
     
-    const newClub = {
-        name: input.value.trim().toUpperCase(),
-        points: 0
-    };
+    const rawName = input.value.trim();
+    const nameUpper = rawName.toUpperCase();
+    const nameKey = rawName.toLowerCase(); // case‑insensitive key
     
-    // Check for duplicate club name (case-insensitive)
-    const existing = clubs.find(c => c.name.toUpperCase() === newClub.name.toUpperCase());
-    if (existing) {
+    // Check secondary collection for duplicate name
+    const nameDoc = await db.collection('clubNames').doc(nameKey).get();
+    if (nameDoc.exists) {
         showUserError('Vereinsname existiert bereits. Bitte wählen Sie einen anderen Namen.');
         return;
     }
     
-    await saveClub(newClub);
-    input.value = '';
+    // Reserve the name in the secondary collection
+    await db.collection('clubNames').doc(nameKey).set({ name: nameUpper });
+    
+    const newClub = {
+        name: nameUpper,
+        points: 0
+    };
+    
+    try {
+        await saveClub(newClub);
+        input.value = '';
+    } catch (e) {
+        // Rollback name reservation on failure
+        await db.collection('clubNames').doc(nameKey).delete();
+        throw e;
+    }
 }
 
 async function addPoints(id, pts) {
