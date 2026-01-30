@@ -47,7 +47,7 @@ function applyColorPalette() {
  */
 const config = {
   hashtag: 'HBS2026',
-  countdownEndDate: '2026-06-30T00:00:00', // ISO format
+  countdownEndDate: '2026-01-31T00:00:00', // ISO format
   pointsText: 'Punktevergabe: <span>+1 für 10 Shots</span> | <span>+3 für 1 Meter Bar-Getränke</span>',
   colors: {
     primary: '#3f755f',
