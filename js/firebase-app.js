@@ -37,7 +37,6 @@ let showAllInDashboard = false; // Toggle for dashboard view
 let renderTimeout = null;
 let lastRenderedClubs = [];
 let lastRenderedShowAll = false;
-let clubsCache = new Map(); // Client-side cache for club data
 let isLoading = true; // Loading state for skeleton display
 
 // ==================== UTILITY FUNCTIONS ====================
