@@ -2,7 +2,61 @@
 // HBS2026 Live Scoring System - Firebase App Logic
 // =====================================================
 
-// ==================== CONFIGURATION ====================
+// ==================== CONFIGURATION FUNCTIONS ====================
+/**
+ * Apply configuration settings to UI elements
+ */
+function applyConfiguration() {
+  // Apply hashtag to title
+  document.title = `#${config.hashtag} Live-Scoring`;
+  
+  // Apply hashtag to main heading
+  const mainHeading = document.querySelector('h1');
+  if (mainHeading) {
+    mainHeading.textContent = `#${config.hashtag}`;
+  }
+  
+  // Apply hashtag to footer
+  const footerHeading = document.querySelector('footer h3');
+  if (footerHeading) {
+    footerHeading.innerHTML = `#${config.hashtag.toLowerCase()} #teamchallenge`;
+  }
+  
+  // Apply points text to header info
+  const headerInfo = document.querySelector('.header-info p');
+  if (headerInfo) {
+    headerInfo.innerHTML = config.pointsText;
+  }
+  
+  // Apply color palette
+  applyColorPalette();
+}
+
+/**
+ * Apply configurable color palette using CSS custom properties
+ */
+function applyColorPalette() {
+  const root = document.documentElement;
+  root.style.setProperty('--color-primary', config.colors.primary);
+  root.style.setProperty('--color-secondary', config.colors.secondary);
+  root.style.setProperty('--color-accent', config.colors.accent);
+}
+
+/**
+ * App configuration for customizable UI elements
+ */
+const config = {
+  hashtag: 'HBS2026',
+  countdownEndDate: '2026-06-30T00:00:00', // ISO format
+  pointsText: 'Punktevergabe: <span>+1 für 10 Shots</span> | <span>+3 für 1 Meter Bar-Getränke</span>',
+  colors: {
+    primary: '#3f755f',
+    secondary: '#e4c342',
+    accent: '#f97316'
+  }
+};
+
+// ==================== FIREBASE CONFIGURATION ====================
 /**
  * Firebase configuration for the HBS2026 application
  */
@@ -618,21 +672,21 @@ function render() {
 // ==================== COUNTDOWN FUNCTIONS ====================
 function updateCountdown() {
     const now = new Date();
-    const saturday = new Date();
-    saturday.setDate(now.getDate() + ((6 - now.getDay() + 7) % 7) || 7);
-    saturday.setHours(0, 0, 0, 0);
-    
-    const diff = saturday - now;
+    const endDate = new Date(config.countdownEndDate);
+    const diff = endDate - now;
     
     if (diff <= 0) {
-        saturday.setDate(saturday.getDate() + 7);
+        // Countdown finished
+        document.getElementById('countdown-hours').textContent = '00';
+        document.getElementById('countdown-minutes').textContent = '00';
+        document.getElementById('countdown-seconds').textContent = '00';
+        return;
     }
     
-    const updatedDiff = saturday - now;
-    const totalHours = Math.floor(updatedDiff / (1000 * 60 * 60));
-    const hours = totalHours; // Show total hours, not modulo 24
-    const minutes = Math.floor((updatedDiff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((updatedDiff % (1000 * 60)) / 1000);
+    const totalHours = Math.floor(diff / (1000 * 60 * 60));
+    const hours = totalHours; // Show total hours
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
     
     document.getElementById('countdown-hours').textContent = String(hours).padStart(2, '0');
     document.getElementById('countdown-minutes').textContent = String(minutes).padStart(2, '0');
@@ -726,6 +780,9 @@ if ('serviceWorker' in navigator) {
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('DOM loaded, starting initialization...');
+    
+    // Apply configuration to UI
+    applyConfiguration();
     
     // Initialize login UI
     updateLoginUI();
