@@ -306,6 +306,14 @@ async function signInWithGoogle() {
         const result = await auth.signInWithPopup(googleProvider);
         const user = result.user;
         
+        // Check if this is a new user (creation time equals last sign in time)
+        if (user.metadata.creationTime === user.metadata.lastSignInTime) {
+            // New user, delete and show error
+            await user.delete();
+            showLoginError('Benutzer existiert nicht. Bitte kontaktieren Sie den Admin.');
+            return;
+        }
+        
         console.log('Google sign-in successful:', user);
         
         isLoggedIn = true;
