@@ -394,6 +394,13 @@ async function addClub() {
         points: 0
     };
     
+    // Check for duplicate club name (case-insensitive)
+    const existing = clubs.find(c => c.name.toUpperCase() === newClub.name.toUpperCase());
+    if (existing) {
+        showUserError('Vereinsname existiert bereits. Bitte wählen Sie einen anderen Namen.');
+        return;
+    }
+    
     await saveClub(newClub);
     input.value = '';
 }
